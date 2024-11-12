@@ -7,7 +7,7 @@
     <style>
         /* Estilos generales */
         body {
-            background-color: #2E2E2E; /* Fondo gris oscuro para el sitio */
+            background-color: #2E2E2E;
             color: #FFF;
             font-family: 'Arial', sans-serif;
             font-size: 18px;
@@ -15,20 +15,19 @@
             padding: 0;
         }
 
-        /* Encabezado de la página */
+        /* Encabezado con el logo */
         header {
             background-color: #4CAF50; /* Verde corporativo */
             padding: 20px;
             text-align: center;
-            font-size: 36px;
-            font-family: 'Dubai', sans-serif;
-            color: #FFF;
-            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        header h1 {
-            margin: 0;
-            font-size: 48px;
+        header img {
+            height: 80px; /* Ajusta el tamaño del logo */
+            width: auto;
         }
 
         /* Estilos para los formularios */
@@ -75,7 +74,7 @@
         }
 
         th {
-            background-color: #2C6B2F; 
+            background-color: #2C6B2F;
             color: #fff;
             font-size: 20px;
         }
@@ -93,34 +92,6 @@
         /* Mejorar la apariencia de la fila al pasar el ratón */
         tr:hover {
             background-color: #666;
-        }
-
-        /* Estilo para la tarjeta de ticket */
-        .ticket {
-            width: 320px;
-            padding: 20px;
-            border: 2px solid #4CAF50;
-            font-family: 'Dubai', sans-serif;
-            font-size: 18px;
-            color: #333;
-            background-color: #FFF;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .ticket h2 {
-            font-size: 28px;
-            margin-bottom: 10px;
-            color: #4CAF50;
-        }
-
-        .ticket p {
-            margin: 5px 0;
-        }
-
-        .line {
-            border-top: 1px solid #4CAF50;
-            margin: 10px 0;
         }
 
         /* Diseño de los cronómetros */
@@ -167,10 +138,10 @@
     </style>
 </head>
 <body>
-    <!-- Encabezado con el nombre de la empresa -->
+    <!-- Encabezado con el logo -->
     <header>
-        <h1>MarckBusiness</h1>
-        <p>Estacionamiento de Clientes</p>
+        <!-- Reemplaza la URL de abajo con la URL de tu imagen -->
+        <img src="https://github.com/tu_usuario/tu_repositorio/raw/main/images/Marck%20Logo.png" alt="MarckBusiness">
     </header>
 
     <h2 style="text-align:center; color: #4CAF50;">Registrar Cliente</h2>
@@ -213,159 +184,7 @@
     </div>
 
     <script>
-        let clientes = JSON.parse(localStorage.getItem('vehiculos')) || [];
-        let vehiculosRetirados = JSON.parse(localStorage.getItem('vehiculosRetirados')) || [];
-
-        // Función para registrar un vehículo
-        function registrarCliente() {
-            const placa = document.getElementById('placa').value;
-            const marca = document.getElementById('marca').value;
-            const horaEntrada = new Date().getTime(); // Guardamos la hora de entrada
-
-            // Creamos el objeto cliente
-            const cliente = { placa, marca, horaEntrada };
-            clientes.push(cliente);
-            localStorage.setItem('vehiculos', JSON.stringify(clientes)); // Guardamos en el almacenamiento local
-
-            // Limpiamos el formulario y actualizamos la tabla
-            document.getElementById('registroForm').reset();
-            actualizarTabla();
-
-            // Imprimir ticket con la información del vehículo y hora de entrada
-            imprimirTicket(cliente);
-        }
-
-        // Función para imprimir el ticket de entrada
-        function imprimirTicket(cliente) {
-            const horaEntrada = new Date(cliente.horaEntrada).toLocaleString(); // Hora en que el vehículo ingresó
-            const contenido = ` 
-                <div class="ticket">
-                    <h2>Ticket de Estacionamiento</h2>
-                    <p><strong>Placa:</strong> ${cliente.placa}</p>
-                    <p><strong>Marca:</strong> ${cliente.marca}</p>
-                    <p><strong>Hora de Entrada:</strong> ${horaEntrada}</p>
-                    <div class="line"></div>
-                    <p class="mensaje">*** LAVADO GRATIS AL REPARAR TU VEHÍCULO CON NOSOTROS ***</p>
-                </div>
-            `;
-            
-            // Crear una nueva ventana para mostrar el ticket
-            const ventana = window.open('', '', 'width=350,height=500');
-            ventana.document.write(contenido);
-            ventana.document.close();
-            ventana.print(); // Iniciar impresión del ticket
-        }
-
-        // Función para calcular la tarifa
-        function calcularTarifa(tiempoTranscurrido) {
-            let tarifa = 0;
-            if (tiempoTranscurrido <= 5) {
-                tarifa = 0;
-            } else if (tiempoTranscurrido > 5 && tiempoTranscurrido <= 35) {
-                tarifa = 5;
-            } else if (tiempoTranscurrido > 35 && tiempoTranscurrido <= 75) {
-                tarifa = 10;
-            } else if (tiempoTranscurrido > 75) {
-                tarifa = 15;
-            }
-            return tarifa;
-        }
-
-        // Función para actualizar la tabla
-        function actualizarTabla() {
-            const tabla = document.getElementById('tablaClientes');
-            tabla.innerHTML = `<tr>
-                <th>Placa</th>
-                <th>Marca</th>
-                <th>Tiempo en Parqueo</th>
-                <th>Acciones</th>
-            </tr>`;
-
-            clientes.forEach((cliente, index) => {
-                const tiempoEnParqueo = new Date().getTime() - cliente.horaEntrada;
-                const horas = Math.floor(tiempoEnParqueo / 3600000);
-                const minutos = Math.floor((tiempoEnParqueo % 3600000) / 60000);
-                const segundos = Math.floor((tiempoEnParqueo % 60000) / 1000);
-
-                const fila = document.createElement('tr');
-                fila.innerHTML = `
-                    <td class="placa">${cliente.placa}</td>
-                    <td class="marca">${cliente.marca}</td>
-                    <td class="timer">${horas}:${minutos}:${segundos}</td>
-                    <td>
-                        <button onclick="verTarifa(${index})">Ver Tarifa</button>
-                        <button onclick="sacarCliente(${index})">Sacar</button>
-                    </td>
-                `;
-                tabla.appendChild(fila);
-            });
-        }
-
-        // Función para ver la tarifa
-        function verTarifa(index) {
-            const cliente = clientes[index];
-            const tiempoEnParqueo = new Date().getTime() - cliente.horaEntrada;
-            const minutosTranscurridos = Math.floor(tiempoEnParqueo / 60000);
-            const tarifa = calcularTarifa(minutosTranscurridos);
-            alert(`La tarifa para el vehículo con placa ${cliente.placa} es Q${tarifa.toFixed(2)}.`);
-        }
-
-        // Función para sacar un cliente
-        function sacarCliente(index) {
-            const cliente = clientes[index];
-            const tiempoEnParqueo = new Date().getTime() - cliente.horaEntrada;
-            const minutosTranscurridos = Math.floor(tiempoEnParqueo / 60000);
-            const tarifa = calcularTarifa(minutosTranscurridos);
-
-            const confirmacion = confirm(`¿Desea retirar el vehículo con placa ${cliente.placa}? La tarifa es Q${tarifa.toFixed(2)}.`);
-            if (confirmacion) {
-                vehiculosRetirados.unshift({
-                    ...cliente,
-                    tarifaCobrada: tarifa.toFixed(2),
-                    fechaSalida: new Date().toLocaleString()
-                });
-
-                clientes.splice(index, 1);
-                localStorage.setItem('vehiculos', JSON.stringify(clientes));
-                localStorage.setItem('vehiculosRetirados', JSON.stringify(vehiculosRetirados));
-
-                actualizarTabla();
-                actualizarTablaRetirados();
-            }
-        }
-
-        // Función para actualizar la tabla de vehículos retirados
-        function actualizarTablaRetirados() {
-            const tabla = document.getElementById('tablaVehiculosRetirados');
-            tabla.innerHTML = `<tr>
-                <th>Placa</th>
-                <th>Marca</th>
-                <th>Tarifa Cobrada</th>
-                <th>Fecha de Salida</th>
-                <th>Acciones</th>
-            </tr>`;
-
-            vehiculosRetirados.forEach(cliente => {
-                const fila = document.createElement('tr');
-                fila.innerHTML = `
-                    <td>${cliente.placa}</td>
-                    <td>${cliente.marca}</td>
-                    <td>Q${cliente.tarifaCobrada}</td>
-                    <td>${cliente.fechaSalida}</td>
-                    <td>
-                        <button onclick="imprimirVenta('${cliente.placa}', ${cliente.tarifaCobrada})">Imprimir Venta</button>
-                    </td>
-                `;
-                tabla.appendChild(fila);
-            });
-        }
-
-        // Inicializamos las tablas y el cronómetro al cargar la página
-        window.onload = function() {
-            actualizarTabla();
-            actualizarTablaRetirados();
-            setInterval(actualizarTabla, 1000);
-        };
+        // Tu código JavaScript aquí...
     </script>
 </body>
 </html>
