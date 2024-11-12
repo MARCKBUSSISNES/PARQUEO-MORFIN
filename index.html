@@ -7,28 +7,29 @@
     <style>
         /* Estilos generales */
         body {
-            background-color: #1c1c1c;
-            color: #ffffff;
+            background-color: #f4f4f4;
+            color: #333;
             font-family: 'Arial', sans-serif;
             font-size: 18px;
             margin: 0;
             padding: 0;
         }
 
-        /* Cabecera */
+        /* Estilos del encabezado */
         header {
-            background-color: #333;
+            background-color: #2e7d32;
             padding: 20px;
             text-align: center;
+            color: #fff;
         }
 
         header img {
-            width: 150px;
-            height: auto;
+            width: 150px; /* Ajusta el tamaño del logo según necesites */
+            margin-bottom: 10px;
         }
 
         h2 {
-            color: #4CAF50; /* Verde llamativo para los títulos */
+            color: #4CAF50;
             font-size: 32px;
             margin-bottom: 20px;
         }
@@ -37,7 +38,7 @@
         input, button {
             background-color: #333;
             color: #fff;
-            border: 2px solid #4CAF50; /* Verde para botones y bordes */
+            border: 2px solid #4CAF50;
             padding: 10px;
             font-size: 16px;
             margin: 10px 0;
@@ -48,12 +49,12 @@
 
         button {
             cursor: pointer;
-            background-color: #4CAF50; /* Verde para el botón */
+            background-color: #4CAF50;
             font-size: 18px;
         }
 
         button:hover {
-            background-color: #45a049; /* Efecto hover para el botón */
+            background-color: #45a049;
         }
 
         /* Estilos para las tablas */
@@ -64,13 +65,13 @@
         }
 
         th, td {
-            border: 1px solid #4CAF50; /* Verde para los bordes de las tablas */
+            border: 1px solid #4CAF50;
             padding: 15px;
             text-align: center;
         }
 
         th {
-            background-color: #2e7d32; /* Fondo verde oscuro para los encabezados */
+            background-color: #2e7d32;
             color: #fff;
         }
 
@@ -91,13 +92,8 @@
 
         .timer {
             font-size: 30px;
-            color: #FFEB3B; /* Amarillo brillante para el cronómetro */
-            font-family: 'Digital-7', sans-serif; /* Fuente tipo LCD */
-        }
-
-        .value {
-            font-size: 22px;
-            color: #FFEB3B; /* Amarillo brillante para el valor */
+            color: #FFEB3B;
+            font-family: 'Digital-7', sans-serif;
         }
 
         .tabla-section {
@@ -108,16 +104,11 @@
             margin-top: 30px;
         }
 
-        .timer, .value {
-            font-family: 'Courier New', Courier, monospace;
-        }
-
         /* Para importar la fuente 'Dubai' */
         @import url('https://fonts.googleapis.com/css2?family=Dubai&display=swap');
 
-        /* Aumentar tamaño de fuente para placa y marca en la tabla */
         .placa, .marca {
-            font-size: 20px; /* Aumentar el tamaño de la letra de placa y marca */
+            font-size: 20px;
             font-weight: bold;
         }
 
@@ -154,12 +145,12 @@
     </style>
 </head>
 <body>
+    <!-- Encabezado con el logo de la empresa -->
     <header>
-        <!-- Logo de la empresa -->
         <img src="https://github.com/marckbussines/parqueo/raw/main/Logo%20Marck.png" alt="Logo Marck">
+        <h2>Registrar Cliente - Marck Business</h2>
     </header>
 
-    <h2>Registrar Cliente</h2>
     <div class="container">
         <div class="details">
             <form id="registroForm" onsubmit="registrarCliente(); return false;">
@@ -222,7 +213,7 @@
         // Función para imprimir el ticket de entrada
         function imprimirTicket(cliente) {
             const horaEntrada = new Date(cliente.horaEntrada).toLocaleString(); // Hora en que el vehículo ingresó
-            const contenido = ` 
+            const contenido = `
                 <div class="ticket">
                     <h2>Ticket de Estacionamiento</h2>
                     <p><strong>Placa:</strong> ${cliente.placa}</p>
@@ -267,21 +258,32 @@
             const tiempoTranscurrido = (horaSalida - cliente.horaEntrada) / 1000; // Tiempo en milisegundos
 
             let tarifa = calcularTarifa(tiempoTranscurrido / 60); // Convertimos a minutos
-            let mensaje = `El tiempo en el parqueo fue de ${Math.floor(tiempoTranscurrido / 60)} minutos.`;
-            let vehiculoRetirado = { ...cliente, tarifa, horaSalida: new Date(horaSalida).toLocaleString() };
-            vehiculosRetirados.push(vehiculoRetirado);
-            localStorage.setItem('vehiculosRetirados', JSON.stringify(vehiculosRetirados));
+            let mensaje = `El total a cobrar por el vehículo ${cliente.placa} es Q${tarifa.toFixed(2)}. ¿Deseas imprimir el recibo?`;
+            
+            // Confirmamos antes de continuar con la acción
+            if (confirm(mensaje)) {
+                // Guardamos el vehículo retirado con el valor cobrado
+                vehiculosRetirados.unshift({
+                    ...cliente,
+                    tarifaCobrada: tarifa.toFixed(2),
+                    fechaSalida: new Date().toLocaleString()
+                });
 
-            clientes.splice(index, 1); // Eliminar de la lista de vehículos en parqueo
-            localStorage.setItem('vehiculos', JSON.stringify(clientes));
+                // Guardamos los datos en localStorage
+                clientes.splice(index, 1); // Eliminamos el vehículo de la lista
+                localStorage.setItem('vehiculos', JSON.stringify(clientes));
+                localStorage.setItem('vehiculosRetirados', JSON.stringify(vehiculosRetirados));
 
-            alert(`Vehículo retirado: ${mensaje} \nTarifa a cobrar: $${tarifa}`);
-            actualizarTabla();
+                // Actualizamos las tablas
+                actualizarTabla();
+            }
         }
 
-        // Función para actualizar la tabla de vehículos
+        // Función para actualizar las tablas
         function actualizarTabla() {
+            // Limpiar las tablas
             const tablaClientes = document.getElementById('tablaClientes');
+            const tablaVehiculosRetirados = document.getElementById('tablaVehiculosRetirados');
             tablaClientes.innerHTML = `
                 <tr>
                     <th>Placa</th>
@@ -290,21 +292,7 @@
                     <th>Acciones</th>
                 </tr>
             `;
-
-            clientes.forEach((cliente, index) => {
-                const tiempoParqueo = (new Date().getTime() - cliente.horaEntrada) / 1000; // Tiempo en segundos
-                const tiempoMinutos = Math.floor(tiempoParqueo / 60); // Convertir a minutos
-                const fila = tablaClientes.insertRow();
-                fila.innerHTML = `
-                    <td class="placa">${cliente.placa}</td>
-                    <td class="marca">${cliente.marca}</td>
-                    <td class="timer">${tiempoMinutos} min</td>
-                    <td><button onclick="sacarCliente(${index})">Sacar Vehículo</button></td>
-                `;
-            });
-
-            const tablaRetirados = document.getElementById('tablaVehiculosRetirados');
-            tablaRetirados.innerHTML = `
+            tablaVehiculosRetirados.innerHTML = `
                 <tr>
                     <th>Placa</th>
                     <th>Marca</th>
@@ -313,26 +301,37 @@
                     <th>Acciones</th>
                 </tr>
             `;
-            vehiculosRetirados.forEach((vehiculo) => {
-                const fila = tablaRetirados.insertRow();
-                fila.innerHTML = `
-                    <td class="placa">${vehiculo.placa}</td>
-                    <td class="marca">${vehiculo.marca}</td>
-                    <td class="value">$${vehiculo.tarifa}</td>
-                    <td>${vehiculo.horaSalida}</td>
-                    <td><button onclick="eliminarRetirado('${vehiculo.placa}')">Eliminar</button></td>
+
+            // Agregar datos de vehículos en parqueo
+            clientes.forEach((cliente, index) => {
+                const tiempoEnParqueo = Math.floor((new Date().getTime() - cliente.horaEntrada) / 1000 / 60); // En minutos
+                const fila = `
+                    <tr>
+                        <td>${cliente.placa}</td>
+                        <td>${cliente.marca}</td>
+                        <td>${tiempoEnParqueo} min</td>
+                        <td><button onclick="sacarCliente(${index})">Sacar</button></td>
+                    </tr>
                 `;
+                tablaClientes.innerHTML += fila;
+            });
+
+            // Agregar datos de vehículos retirados
+            vehiculosRetirados.forEach(cliente => {
+                const filaRetiro = `
+                    <tr>
+                        <td>${cliente.placa}</td>
+                        <td>${cliente.marca}</td>
+                        <td>${cliente.tarifaCobrada} Q</td>
+                        <td>${cliente.fechaSalida}</td>
+                        <td>---</td>
+                    </tr>
+                `;
+                tablaVehiculosRetirados.innerHTML += filaRetiro;
             });
         }
 
-        // Función para eliminar vehículo retirado
-        function eliminarRetirado(placa) {
-            vehiculosRetirados = vehiculosRetirados.filter(vehiculo => vehiculo.placa !== placa);
-            localStorage.setItem('vehiculosRetirados', JSON.stringify(vehiculosRetirados));
-            actualizarTabla();
-        }
-
-        // Inicializar la tabla con datos guardados
+        // Inicializar las tablas
         actualizarTabla();
     </script>
 </body>
