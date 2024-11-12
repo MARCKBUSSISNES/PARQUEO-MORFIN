@@ -98,8 +98,12 @@
             font-family: 'Courier New', Courier, monospace;
         }
 
-        /* Para importar la fuente 'Dubai' */
+        /* Para importar la fuente 'Dubai' con respaldo en caso de no cargar */
         @import url('https://fonts.googleapis.com/css2?family=Dubai&display=swap');
+
+        body {
+            font-family: 'Dubai', Arial, sans-serif; /* Fuente personalizada con respaldo */
+        }
 
         /* Aumentar tamaño de fuente para placa y marca en la tabla */
         .placa, .marca {
@@ -183,8 +187,14 @@
 
         // Función para registrar un vehículo
         function registrarCliente() {
-            const placa = document.getElementById('placa').value;
-            const marca = document.getElementById('marca').value;
+            const placa = document.getElementById('placa').value.trim();
+            const marca = document.getElementById('marca').value.trim();
+
+            if (placa === "" || marca === "") {
+                alert("Por favor, complete todos los campos.");
+                return;
+            }
+
             const horaEntrada = new Date().getTime(); // Guardamos la hora de entrada
 
             // Creamos el objeto cliente
@@ -247,122 +257,77 @@
             const horaSalida = new Date().getTime();
             const tiempoTranscurrido = (horaSalida - cliente.horaEntrada) / 1000; // Tiempo en milisegundos
 
-            let tarifa = calcularTarifa(tiempoTranscurrido / 60); // Convertimos a minutos
-            let mensaje = `El total a cobrar por el vehículo ${cliente.placa} es Q${tarifa.toFixed(2)}. ¿Deseas imprimir el recibo?`;
-            
-            // Confirmamos antes de continuar con la acción
-            if (confirm(mensaje)) {
-                // Guardamos el vehículo retirado con el valor cobrado
-                vehiculosRetirados.unshift({
-                    ...cliente,
-                    tarifaCobrada: tarifa.toFixed(2),
-                    fechaSalida: new Date().toLocaleString()
-                });
+            let tarifa = calcularTarifa(tiempoTranscurrido / 60); // Convertir a minutos
 
-                // Guardamos los datos en localStorage
-                clientes.splice(index, 1); // Eliminamos el vehículo de la lista
-                localStorage.setItem('vehiculos', JSON.stringify(clientes)); // Actualizamos el almacenamiento local
-                localStorage.setItem('vehiculosRetirados', JSON.stringify(vehiculosRetirados)); // Actualizamos los vehículos retirados
+            // Mover el vehículo a los vehículos retirados
+            vehiculosRetirados.push({ ...cliente, tarifa, horaSalida: new Date(horaSalida).toLocaleString() });
+            localStorage.setItem('vehiculosRetirados', JSON.stringify(vehiculosRetirados));
 
-                actualizarTabla(); // Actualizamos la tabla
-                actualizarTablaRetirados(); // Actualizamos la tabla de vehículos retirados
-                imprimirVenta(cliente.placa, tarifa); // Imprimimos el ticket de venta
-            }
+            // Eliminar el vehículo del parqueo
+            clientes.splice(index, 1);
+            localStorage.setItem('vehiculos', JSON.stringify(clientes)); // Actualizar el almacenamiento local
+
+            // Actualizar la tabla
+            actualizarTabla();
         }
 
-        // Función para mostrar la tarifa actual de un vehículo en parqueo
-        function verTarifa(index) {
-            const cliente = clientes[index];
-            const horaEntrada = cliente.horaEntrada;
-            const horaActual = new Date().getTime();
-            const tiempoTranscurrido = (horaActual - horaEntrada) / 1000 / 60; // Tiempo en minutos
-            const tarifa = calcularTarifa(tiempoTranscurrido);
-            alert(`La tarifa actual para el vehículo con placa ${cliente.placa} es Q${tarifa.toFixed(2)}`);
-        }
-
-        // Función para actualizar la tabla de vehículos en el parqueo
+        // Función para actualizar la tabla
         function actualizarTabla() {
-            const tabla = document.getElementById('tablaClientes');
-            tabla.innerHTML = `<tr>
-                <th>Placa</th>
-                <th>Marca</th>
-                <th>Tiempo en Parqueo</th>
-                <th>Acciones</th>
-            </tr>`;
+            const tablaClientes = document.getElementById('tablaClientes');
+            const tablaRetirados = document.getElementById('tablaVehiculosRetirados');
+            tablaClientes.innerHTML = `
+                <tr>
+                    <th>Placa</th>
+                    <th>Marca</th>
+                    <th>Tiempo en Parqueo</th>
+                    <th>Acciones</th>
+                </tr>
+            `;
+            tablaRetirados.innerHTML = `
+                <tr>
+                    <th>Placa</th>
+                    <th>Marca</th>
+                    <th>Tarifa Cobrada</th>
+                    <th>Fecha de Salida</th>
+                    <th>Acciones</th>
+                </tr>
+            `;
 
+            // Rellenar la tabla de vehículos en parqueo
             clientes.forEach((cliente, index) => {
-                const fila = document.createElement('tr');
-                
-                // Calculamos el tiempo transcurrido en horas, minutos y segundos
-                const tiempoEnParqueo = new Date().getTime() - cliente.horaEntrada;
-                const horas = Math.floor(tiempoEnParqueo / 3600000); // horas
-                const minutos = Math.floor((tiempoEnParqueo % 3600000) / 60000); // minutos
-                const segundos = Math.floor((tiempoEnParqueo % 60000) / 1000); // segundos
-                const milisegundos = Math.floor((tiempoEnParqueo % 1000) / 100); // milisegundos
+                const tiempoTranscurrido = (new Date().getTime() - cliente.horaEntrada) / 1000; // En segundos
+                const minutos = Math.floor(tiempoTranscurrido / 60);
+                const segundos = Math.floor(tiempoTranscurrido % 60);
 
+                let fila = document.createElement('tr');
                 fila.innerHTML = `
                     <td class="placa">${cliente.placa}</td>
                     <td class="marca">${cliente.marca}</td>
-                    <td class="timer">${horas}:${minutos}:${segundos}:${milisegundos}</td>
-                    <td>
-                        <button onclick="verTarifa(${index})">Ver Tarifa</button>
-                        <button onclick="sacarCliente(${index})">Sacar</button>
-                    </td>
+                    <td>${minutos} min ${segundos} seg</td>
+                    <td><button onclick="sacarCliente(${index})">Retirar</button></td>
                 `;
-                tabla.appendChild(fila);
+                tablaClientes.appendChild(fila);
             });
-        }
 
-        // Función para actualizar la tabla de vehículos retirados
-        function actualizarTablaRetirados() {
-            const tabla = document.getElementById('tablaVehiculosRetirados');
-            tabla.innerHTML = `<tr>
-                <th>Placa</th>
-                <th>Marca</th>
-                <th>Tarifa Cobrada</th>
-                <th>Fecha de Salida</th>
-                <th>Acciones</th>
-            </tr>`;
-
-            vehiculosRetirados.forEach(cliente => {
-                const fila = document.createElement('tr');
+            // Rellenar la tabla de vehículos retirados
+            vehiculosRetirados.forEach((vehiculo) => {
+                let fila = document.createElement('tr');
                 fila.innerHTML = `
-                    <td>${cliente.placa}</td>
-                    <td>${cliente.marca}</td>
-                    <td>Q${cliente.tarifaCobrada}</td>
-                    <td>${cliente.fechaSalida}</td>
-                    <td>
-                        <button onclick="imprimirVenta('${cliente.placa}', ${cliente.tarifaCobrada})">Imprimir Venta</button>
-                    </td>
+                    <td class="placa">${vehiculo.placa}</td>
+                    <td class="marca">${vehiculo.marca}</td>
+                    <td>${vehiculo.tarifa} USD</td>
+                    <td>${vehiculo.horaSalida}</td>
+                    <td></td>
                 `;
-                tabla.appendChild(fila);
+                tablaRetirados.appendChild(fila);
             });
         }
 
-        // Función para imprimir el recibo de venta
-        function imprimirVenta(placa, tarifa) {
-            const cliente = vehiculosRetirados.find(cliente => cliente.placa === placa);
-            const contenido = `
-                <div style="width: 300px; font-size: 18px; text-align: center;">
-                    <h2>Recibo de Estacionamiento</h2>
-                    <p><strong>Placa:</strong> ${cliente.placa}</p>
-                    <p><strong>Marca:</strong> ${cliente.marca}</p>
-                    <p><strong>Tarifa Cobrada:</strong> Q${tarifa}</p>
-                    <p><strong>Fecha de Salida:</strong> ${cliente.fechaSalida}</p>
-                </div>
-            `;
-            const ventana = window.open('', '', 'width=300,height=400');
-            ventana.document.write(contenido);
-            ventana.document.close();
-            ventana.print();
-        }
+        // Inicialización de la tabla al cargar la página
+        actualizarTabla();
 
-        // Inicializamos las tablas al cargar la página
-        window.onload = function() {
-            actualizarTabla();
-            actualizarTablaRetirados();
-            setInterval(actualizarTabla, 1000); // Actualizamos la tabla cada segundo
-        };
+        // Actualización de la tabla cada 10 segundos
+        setInterval(actualizarTabla, 10000);
     </script>
 </body>
 </html>
