@@ -31,6 +31,12 @@
             font-size: 48px;
         }
 
+        header p {
+            font-size: 12px; /* Hacemos el eslogan más pequeño */
+            color: rgba(0, 0, 0, 0.5); /* Color negro casi imperceptible */
+            margin-top: 5px;
+        }
+
         /* Estilos para los formularios */
         input, button {
             background-color: #333;
@@ -170,10 +176,10 @@
     <!-- Encabezado con el nombre de la empresa -->
     <header>
         <h1>MarckBusiness</h1>
-        <p>Estacionamiento de Clientes</p>
+        <p>Soluciones Sin Límites</p> <!-- Eslogan en color negro casi imperceptible -->
     </header>
 
-    <h2 style="text-align:center; color: #4CAF50;">Registrar Cliente</h2>
+    <h2 style="text-align:center; color: #4CAF50;">Ingresar Vehículo</h2> <!-- Cambié "Registrar Cliente" por "Ingresar Vehículo" -->
 
     <!-- Contenedor para formulario y tabla -->
     <div class="container">
@@ -183,7 +189,7 @@
                 <input type="text" id="placa" required><br>
                 <label>Marca:</label>
                 <input type="text" id="marca" required><br>
-                <button type="submit">Ingresar Cliente</button>
+                <button type="submit">Ingresar Vehículo</button>
             </form>
         </div>
     </div>
