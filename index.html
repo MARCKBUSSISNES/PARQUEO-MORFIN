@@ -336,29 +336,15 @@
             });
         }
 
-        // Función para imprimir el recibo de venta
-        function imprimirVenta(placa, tarifa) {
-            const cliente = vehiculosRetirados.find(cliente => cliente.placa === placa);
-            const contenido = `
-                <div style="width: 300px; font-size: 18px; text-align: center;">
-                    <h2>Recibo de Estacionamiento</h2>
-                    <p><strong>Placa:</strong> ${cliente.placa}</p>
-                    <p><strong>Marca:</strong> ${cliente.marca}</p>
-                    <p><strong>Tarifa Cobrada:</strong> Q${tarifa}</p>
-                    <p><strong>Fecha de Salida:</strong> ${cliente.fechaSalida}</p>
-                </div>
-            `;
-            const ventana = window.open('', '', 'width=300,height=400');
-            ventana.document.write(contenido);
-            ventana.document.close();
-            ventana.print();
-        }
-
-        // Inicializamos las tablas al cargar la página
+        // Inicializamos las tablas y el cronómetro al cargar la página
         window.onload = function() {
             actualizarTabla();
             actualizarTablaRetirados();
+
+            // Actualizar cronómetros cada segundo
+            setInterval(actualizarTabla, 1000);
         };
     </script>
 </body>
 </html>
+
