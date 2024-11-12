@@ -101,9 +101,9 @@
             background-color: #666;
         }
 
-        /* Estilo para la tarjeta de ticket */
+        /* Estilo para la tarjeta de ticket de factura */
         .ticket {
-            width: 320px;
+            width: 350px;
             padding: 20px;
             border: 2px solid #4CAF50;
             font-family: 'Dubai', sans-serif;
@@ -111,22 +111,31 @@
             color: #333;
             background-color: #FFF;
             border-radius: 10px;
-            text-align: center;
+            text-align: left;
         }
 
         .ticket h2 {
             font-size: 28px;
             margin-bottom: 10px;
             color: #4CAF50;
+            text-align: center;
         }
 
         .ticket p {
-            margin: 5px 0;
+            margin: 10px 0;
+            font-size: 18px;
         }
 
         .line {
             border-top: 1px solid #4CAF50;
             margin: 10px 0;
+        }
+
+        .total {
+            font-size: 20px;
+            font-weight: bold;
+            color: #FF5733;
+            margin-top: 20px;
         }
 
         /* Diseño de los cronómetros */
@@ -241,17 +250,20 @@
             imprimirTicket(cliente);
         }
 
-        // Función para imprimir el ticket de entrada
-        function imprimirTicket(cliente) {
+        // Función para imprimir el ticket de salida (más parecido a una factura)
+        function imprimirTicket(cliente, tarifa) {
             const horaEntrada = new Date(cliente.horaEntrada).toLocaleString(); // Hora en que el vehículo ingresó
             const contenido = ` 
                 <div class="ticket">
-                    <h2>Ticket de Estacionamiento</h2>
+                    <h2>Factura de Estacionamiento</h2>
                     <p><strong>Placa:</strong> ${cliente.placa}</p>
                     <p><strong>Marca:</strong> ${cliente.marca}</p>
                     <p><strong>Hora de Entrada:</strong> ${horaEntrada}</p>
                     <div class="line"></div>
-                    <p class="mensaje">*** LAVADO GRATIS AL REPARAR TU VEHÍCULO CON NOSOTROS ***</p>
+                    <p><strong>Tarifa Cobrada:</strong> Q${tarifa}</p>
+                    <div class="line"></div>
+                    <p class="total">Total a Pagar: Q${tarifa}</p>
+                    <p>Gracias por usar nuestros servicios</p>
                 </div>
             `;
             
@@ -316,7 +328,7 @@
             alert(`La tarifa para el vehículo con placa ${cliente.placa} es Q${tarifa.toFixed(2)}.`);
         }
 
-        // Función para sacar un cliente
+        // Función para sacar un cliente y generar el ticket
         function sacarCliente(index) {
             const cliente = clientes[index];
             const tiempoEnParqueo = new Date().getTime() - cliente.horaEntrada;
@@ -337,6 +349,7 @@
 
                 actualizarTabla();
                 actualizarTablaRetirados();
+                imprimirTicket(cliente, tarifa.toFixed(2)); // Generar ticket de salida
             }
         }
 
