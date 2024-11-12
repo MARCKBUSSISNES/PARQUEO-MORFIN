@@ -268,11 +268,11 @@
                     tarifaCobrada: tarifa.toFixed(2),
                     fechaSalida: new Date().toLocaleString()
                 });
-
-                // Guardamos los datos en localStorage
-                clientes.splice(index, 1); // Eliminamos el vehículo de la lista
-                localStorage.setItem('vehiculos', JSON.stringify(clientes));
                 localStorage.setItem('vehiculosRetirados', JSON.stringify(vehiculosRetirados));
+
+                // Eliminamos el vehículo de la lista de clientes
+                clientes.splice(index, 1);
+                localStorage.setItem('vehiculos', JSON.stringify(clientes));
 
                 // Actualizamos las tablas
                 actualizarTabla();
@@ -281,7 +281,6 @@
 
         // Función para actualizar las tablas
         function actualizarTabla() {
-            // Limpiar las tablas
             const tablaClientes = document.getElementById('tablaClientes');
             const tablaVehiculosRetirados = document.getElementById('tablaVehiculosRetirados');
             tablaClientes.innerHTML = `
