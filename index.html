@@ -252,21 +252,20 @@
             
             // Confirmamos antes de continuar con la acción
             if (confirm(mensaje)) {
-                // Guardamos el vehículo retirado con el valor cobrado
                 vehiculosRetirados.unshift({
                     ...cliente,
                     tarifaCobrada: tarifa.toFixed(2),
                     fechaSalida: new Date().toLocaleString()
                 });
 
-                // Guardamos los datos en localStorage
-                clientes.splice(index, 1); // Eliminamos el vehículo de la lista
-                localStorage.setItem('vehiculos', JSON.stringify(clientes)); // Actualizamos el almacenamiento local
-                localStorage.setItem('vehiculosRetirados', JSON.stringify(vehiculosRetirados)); // Actualizamos los vehículos retirados
+                // Eliminamos al cliente de la lista
+                clientes.splice(index, 1);
+                localStorage.setItem('vehiculos', JSON.stringify(clientes));
+                localStorage.setItem('vehiculosRetirados', JSON.stringify(vehiculosRetirados));
 
-                actualizarTabla(); // Actualizamos la tabla
-                actualizarTablaRetirados(); // Actualizamos la tabla de vehículos retirados
-                imprimirVenta(cliente.placa, tarifa); // Imprimimos el ticket de venta
+                actualizarTabla();
+                actualizarTablaRetirados();
+                imprimirVenta(cliente.placa, tarifa); // Imprimir venta
             }
         }
 
@@ -282,18 +281,15 @@
 
             clientes.forEach((cliente, index) => {
                 const fila = document.createElement('tr');
-                
-                // Calculamos el tiempo transcurrido en horas, minutos y segundos
                 const tiempoEnParqueo = new Date().getTime() - cliente.horaEntrada;
-                const horas = Math.floor(tiempoEnParqueo / 3600000); // horas
-                const minutos = Math.floor((tiempoEnParqueo % 3600000) / 60000); // minutos
-                const segundos = Math.floor((tiempoEnParqueo % 60000) / 1000); // segundos
-                const milisegundos = Math.floor((tiempoEnParqueo % 1000) / 100); // milisegundos
+                const horas = Math.floor(tiempoEnParqueo / 3600000);
+                const minutos = Math.floor((tiempoEnParqueo % 3600000) / 60000);
+                const segundos = Math.floor((tiempoEnParqueo % 60000) / 1000);
 
                 fila.innerHTML = `
                     <td class="placa">${cliente.placa}</td>
                     <td class="marca">${cliente.marca}</td>
-                    <td class="timer">${horas}:${minutos}:${segundos}:${milisegundos}</td>
+                    <td class="timer">${horas}:${minutos}:${segundos}</td>
                     <td>
                         <button onclick="verTarifa(${index})">Ver Tarifa</button>
                         <button onclick="sacarCliente(${index})">Sacar</button>
@@ -301,6 +297,16 @@
                 `;
                 tabla.appendChild(fila);
             });
+        }
+
+        // Función para ver la tarifa
+        function verTarifa(index) {
+            const cliente = clientes[index];
+            const tiempoEnParqueo = new Date().getTime() - cliente.horaEntrada;
+            const minutosTranscurridos = Math.floor(tiempoEnParqueo / 60000); // Convertimos a minutos
+
+            let tarifa = calcularTarifa(minutosTranscurridos);
+            alert(`La tarifa para el vehículo con placa ${cliente.placa} es Q${tarifa.toFixed(2)}.`);
         }
 
         // Función para actualizar la tabla de vehículos retirados
