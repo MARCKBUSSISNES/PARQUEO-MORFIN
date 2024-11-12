@@ -247,25 +247,26 @@
             const horaSalida = new Date().getTime();
             const tiempoTranscurrido = (horaSalida - cliente.horaEntrada) / 1000; // Tiempo en milisegundos
 
-            let tarifa = calcularTarifa(tiempoTranscurrido / 60); // Convertimos a minutos
-            let mensaje = `El total a cobrar por el vehículo ${cliente.placa} es Q${tarifa.toFixed(2)}. ¿Deseas imprimir el recibo?`;
-            
-            // Confirmamos antes de continuar con la acción
-            if (confirm(mensaje)) {
+            // Calcular tarifa
+            const tarifa = calcularTarifa(tiempoTranscurrido / 60); // Convertir a minutos
+            const confirmacion = confirm(`¿Está seguro que desea retirar el vehículo con placa ${cliente.placa}? La tarifa es Q${tarifa.toFixed(2)}.`);
+
+            if (confirmacion) {
+                // Mover cliente a la lista de retirados
                 vehiculosRetirados.unshift({
                     ...cliente,
                     tarifaCobrada: tarifa.toFixed(2),
                     fechaSalida: new Date().toLocaleString()
                 });
 
-                // Eliminamos al cliente de la lista
+                // Eliminar cliente de la lista de parqueo
                 clientes.splice(index, 1);
                 localStorage.setItem('vehiculos', JSON.stringify(clientes));
                 localStorage.setItem('vehiculosRetirados', JSON.stringify(vehiculosRetirados));
 
+                // Actualizar tablas
                 actualizarTabla();
                 actualizarTablaRetirados();
-                imprimirVenta(cliente.placa, tarifa); // Imprimir venta
             }
         }
 
@@ -280,12 +281,12 @@
             </tr>`;
 
             clientes.forEach((cliente, index) => {
-                const fila = document.createElement('tr');
                 const tiempoEnParqueo = new Date().getTime() - cliente.horaEntrada;
                 const horas = Math.floor(tiempoEnParqueo / 3600000);
                 const minutos = Math.floor((tiempoEnParqueo % 3600000) / 60000);
                 const segundos = Math.floor((tiempoEnParqueo % 60000) / 1000);
 
+                const fila = document.createElement('tr');
                 fila.innerHTML = `
                     <td class="placa">${cliente.placa}</td>
                     <td class="marca">${cliente.marca}</td>
@@ -299,7 +300,7 @@
             });
         }
 
-        // Función para ver la tarifa
+        // Función para ver la tarifa del vehículo
         function verTarifa(index) {
             const cliente = clientes[index];
             const tiempoEnParqueo = new Date().getTime() - cliente.horaEntrada;
