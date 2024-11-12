@@ -147,6 +147,7 @@
 <body>
     <!-- Encabezado con el logo de la empresa -->
     <header>
+        <!-- Asegúrate de que esta URL sea correcta y que tu logo esté accesible en GitHub -->
         <img src="https://github.com/marckbussines/parqueo/raw/main/Logo%20Marck.png" alt="Logo Marck">
         <h2>Registrar Cliente - Marck Business</h2>
     </header>
@@ -251,32 +252,28 @@
             return tarifa;
         }
 
-        // Función para sacar un cliente del parqueo
+        // Función para retirar un vehículo
         function sacarCliente(index) {
             const cliente = clientes[index];
-            const horaSalida = new Date().getTime();
-            const tiempoTranscurrido = (horaSalida - cliente.horaEntrada) / 1000; // Tiempo en milisegundos
+            const tiempoEnParqueo = Math.floor((new Date().getTime() - cliente.horaEntrada) / 1000 / 60); // En minutos
+            const tarifaCobrada = calcularTarifa(tiempoEnParqueo);
 
-            let tarifa = calcularTarifa(tiempoTranscurrido / 60); // Convertimos a minutos
-            let mensaje = `El total a cobrar por el vehículo ${cliente.placa} es Q${tarifa.toFixed(2)}. ¿Deseas imprimir el recibo?`;
-            
-            // Confirmamos antes de continuar con la acción
-            if (confirm(mensaje)) {
-                // Guardamos el vehículo retirado con el valor cobrado
-                vehiculosRetirados.unshift({
-                    ...cliente,
-                    tarifaCobrada: tarifa.toFixed(2),
-                    fechaSalida: new Date().toLocaleString()
-                });
-                localStorage.setItem('vehiculosRetirados', JSON.stringify(vehiculosRetirados));
+            // Agregar al arreglo de vehículos retirados
+            vehiculosRetirados.push({
+                ...cliente,
+                tarifaCobrada,
+                fechaSalida: new Date().toLocaleString()
+            });
 
-                // Eliminamos el vehículo de la lista de clientes
-                clientes.splice(index, 1);
-                localStorage.setItem('vehiculos', JSON.stringify(clientes));
+            // Guardamos los vehículos retirados
+            localStorage.setItem('vehiculosRetirados', JSON.stringify(vehiculosRetirados));
 
-                // Actualizamos las tablas
-                actualizarTabla();
-            }
+            // Eliminamos el vehículo de la lista de clientes
+            clientes.splice(index, 1);
+            localStorage.setItem('vehiculos', JSON.stringify(clientes));
+
+            // Actualizamos las tablas
+            actualizarTabla();
         }
 
         // Función para actualizar las tablas
