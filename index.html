@@ -245,9 +245,6 @@
             // Limpiamos el formulario y actualizamos la tabla
             document.getElementById('registroForm').reset();
             actualizarTabla();
-
-            // Imprimir ticket con la información del vehículo y hora de entrada
-            imprimirTicket(cliente);
         }
 
         // Función para imprimir el ticket de salida (más parecido a una factura)
@@ -266,7 +263,7 @@
                     <p>Gracias por usar nuestros servicios</p>
                 </div>
             `;
-            
+
             // Crear una nueva ventana para mostrar el ticket
             const ventana = window.open('', '', 'width=350,height=500');
             ventana.document.write(contenido);
@@ -377,6 +374,24 @@
                 `;
                 tabla.appendChild(fila);
             });
+        }
+
+        // Función para imprimir la venta de vehículos retirados
+        function imprimirVenta(placa, tarifaCobrada) {
+            const contenido = `
+                <div class="ticket">
+                    <h2>Factura de Venta</h2>
+                    <p><strong>Placa:</strong> ${placa}</p>
+                    <p><strong>Tarifa Cobrada:</strong> Q${tarifaCobrada}</p>
+                    <div class="line"></div>
+                    <p class="total">Total a Pagar: Q${tarifaCobrada}</p>
+                    <p>Gracias por utilizar nuestro servicio de parqueo.</p>
+                </div>
+            `;
+            const ventana = window.open('', '', 'width=350,height=500');
+            ventana.document.write(contenido);
+            ventana.document.close();
+            ventana.print(); // Imprimir la venta
         }
 
         // Inicializamos las tablas y el cronómetro al cargar la página
