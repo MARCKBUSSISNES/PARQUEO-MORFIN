@@ -5,205 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Clientes de Parqueo | MarckBusiness</title>
     <style>
-        /* Estilos generales */
-        body {
-            background-color: #2E2E2E; /* Fondo gris oscuro para el sitio */
-            color: #FFF;
-            font-family: 'Arial', sans-serif;
-            font-size 13px;
-            margin: 0;
-            padding: 0;
-        }
-
-        /* Encabezado de la página */
-        header {
-            background-color: #4CAF50; /* Verde corporativo */
-            padding: 20px;
-            text-align: center;
-            font-size: 25px;
-            font-family: 'Dubai', sans-serif;
-            color: #FFF;
-            font-weight: bold;
-        }
-
-        header h1 {
-            margin: 0;
-            font-size: 48px;
-        }
-
-        header p {
-            font-size: 12px; /* Hacemos el eslogan más pequeño */
-            color: rgba(0, 0, 0, 0.5); /* Color negro casi imperceptible */
-            margin-top: 5px;
-        }
-
-        /* Estilos para los formularios */
-        input, button {
-            background-color: #333;
-            color: #fff;
-            border: 2px solid #4CAF50; 
-            padding: 12px;
-            font-size: 16px;
-            margin: 10px 0;
-            width: 100%;
-            box-sizing: border-box;
-            border-radius: 8px;
-            transition: background-color 0.3s ease-in-out;
-        }
-
-        input:focus, button:focus {
-            outline: none;
-            background-color: #2C6B2F;
-        }
-
-        button {
-            cursor: pointer;
-            background-color: #4CAF50; 
-            font-size: 18px;
-        }
-
-        button:hover {
-            background-color: #45a049; 
-        }
-
-        /* Estilos para las tablas */
-        table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 10px;
-            margin-top: 20px;
-        }
-
-        th, td {
-            padding: 15px;
-            text-align: center;
-            border-radius: 10px;
-        }
-
-        th {
-            background-color: #2C6B2F; 
-            color: #fff;
-            font-size: 20px;
-        }
-
-        td {
-            background-color: #444;
-            color: #FFF;
-            font-size: 18px;
-        }
-
-        td button {
-            margin: 5px;
-        }
-
-        /* Mejorar la apariencia de la fila al pasar el ratón */
-        tr:hover {
-            background-color: #666;
-        }
-
-        /* Estilo para la tarjeta de ticket de factura */
-        .ticket {
-            width: 350px;
-            padding: 20px;
-            border: 2px solid #4CAF50;
-            font-family: 'Dubai', sans-serif;
-            font-size: 18px;
-            color: #333;
-            background-color: #FFF;
-            border-radius: 10px;
-            text-align: left;
-        }
-
-        .ticket h2 {
-            font-size: 28px;
-            margin-bottom: 10px;
-            color: #4CAF50;
-            text-align: center;
-        }
-
-        .ticket p {
-            margin: 10px 0;
-            font-size: 18px;
-        }
-
-        .line {
-            border-top: 1px solid #4CAF50;
-            margin: 10px 0;
-        }
-
-        .total {
-            font-size: 20px;
-            font-weight: bold;
-            color: #FF5733;
-            margin-top: 20px;
-        }
-
-        /* Diseño de los cronómetros */
-        .timer {
-            font-size: 26px;
-            color: #FFEB3B; 
-            font-family: 'Courier New', Courier, monospace;
-        }
-
-        /* Sección para tabla y formulario */
-        .container {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-
-        .details {
-            width: 48%;
-        }
-
-        .tabla-section {
-            margin-top: 30px;
-        }
-
-        .placa, .marca {
-            font-size: 20px;
-            font-weight: bold;
-        }
-
-        .mensaje {
-            font-size: 16px;
-            color: #FF5733;
-            margin-top: 10px;
-        }
-
-        .busqueda {
-            margin-top: 30px;
-        }
-
-        /* Definir un fondo degradado para la página */
+        /* Tu CSS original va aquí */
         body {
             background: linear-gradient(to bottom, #333, #222);
+            color: #FFF;
+            font-family: 'Arial', sans-serif;
+        }
+        header {
+            background-color: #4CAF50;
+            padding: 20px;
+            text-align: center;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .cierre {
+            margin: 20px auto;
+            max-width: 600px;
         }
     </style>
 </head>
 <body>
-    <!-- Encabezado con el nombre de la empresa -->
     <header>
         <h1>MarckBusiness</h1>
-        <p>Soluciones Sin Límites</p> <!-- Eslogan en color negro casi imperceptible -->
+        <p>Soluciones Sin Límites</p>
     </header>
 
-    <h2 style="text-align:center; color: #4CAF50;">Ingresar Vehículo</h2> <!-- Cambié "Registrar Cliente" por "Ingresar Vehículo" -->
-
-    <!-- Contenedor para formulario y tabla -->
-    <div class="container">
-        <div class="details">
-            <form id="registroForm" onsubmit="registrarCliente(); return false;">
-                <label>Placa:</label>
-                <input type="text" id="placa" required><br>
-                <label>Marca:</label>
-                <input type="text" id="marca" required><br>
-                <button type="submit">Ingresar Vehículo</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Vehículos en parqueo y retirados -->
     <div class="tabla-section">
         <h2>Vehículos en el Parqueo</h2>
         <table id="tablaClientes">
@@ -227,130 +76,73 @@
         </table>
     </div>
 
+    <!-- Botón para cierre del día -->
+    <div class="cierre">
+        <button onclick="hacerCierre()">Cierre del Día</button>
+        <div id="reporteCierre" style="margin-top: 20px;"></div>
+    </div>
+
     <script>
         let clientes = JSON.parse(localStorage.getItem('vehiculos')) || [];
         let vehiculosRetirados = JSON.parse(localStorage.getItem('vehiculosRetirados')) || [];
 
-        // Función para registrar un vehículo
-        function registrarCliente() {
-            const placa = document.getElementById('placa').value;
-            const marca = document.getElementById('marca').value;
-            const horaEntrada = new Date().getTime(); // Guardamos la hora de entrada
+        function hacerCierre() {
+            const clave = prompt("Ingrese la clave para realizar el cierre del día:");
+            if (clave !== "Multicars") {
+                alert("Clave incorrecta. No se puede realizar el cierre.");
+                return;
+            }
 
-            // Creamos el objeto cliente
-            const cliente = { placa, marca, horaEntrada };
-            clientes.push(cliente);
-            localStorage.setItem('vehiculos', JSON.stringify(clientes)); // Guardamos en el almacenamiento local
+            if (vehiculosRetirados.length === 0) {
+                alert("No hay registros de vehículos retirados para el cierre.");
+                return;
+            }
 
-            // Limpiamos el formulario y actualizamos la tabla
-            document.getElementById('registroForm').reset();
-            actualizarTabla();
-        }
-
-        // Función para imprimir el ticket de salida (más parecido a una factura)
-        function imprimirTicket(cliente, tarifa) {
-            const horaEntrada = new Date(cliente.horaEntrada).toLocaleString(); // Hora en que el vehículo ingresó
-            const contenido = ` 
-                <div class="ticket">
-                    <h2>Factura de Estacionamiento</h2>
-                    <p><strong>Placa:</strong> ${cliente.placa}</p>
-                    <p><strong>Marca:</strong> ${cliente.marca}</p>
-                    <p><strong>Hora de Entrada:</strong> ${horaEntrada}</p>
-                    <div class="line"></div>
-                    <p><strong>Tarifa Cobrada:</strong> Q${tarifa}</p>
-                    <div class="line"></div>
-                    <p class="total">Total a Pagar: Q${tarifa}</p>
-                    <p>Gracias por usar nuestros servicios</p>
-                </div>
+            // Generar reporte del cierre del día
+            let total = 0;
+            let reporteHTML = `
+                <h3>Reporte del Cierre del Día</h3>
+                <table>
+                    <tr>
+                        <th>Hora de Salida</th>
+                        <th>Placa</th>
+                        <th>Tarifa Cobrada</th>
+                    </tr>
             `;
 
-            // Crear una nueva ventana para mostrar el ticket
-            const ventana = window.open('', '', 'width=350,height=500');
-            ventana.document.write(contenido);
-            ventana.document.close();
-            ventana.print(); // Iniciar impresión del ticket
-        }
-
-        // Función para calcular la tarifa
-        function calcularTarifa(tiempoTranscurrido) {
-            let tarifa = 0;
-            if (tiempoTranscurrido <= 5) {
-                tarifa = 0;
-            } else if (tiempoTranscurrido > 5 && tiempoTranscurrido <= 35) {
-                tarifa = 5;
-            } else if (tiempoTranscurrido > 35 && tiempoTranscurrido <= 75) {
-                tarifa = 10;
-            } else if (tiempoTranscurrido > 75) {
-                tarifa = 15;
-            }
-            return tarifa;
-        }
-
-        // Función para actualizar la tabla
-        function actualizarTabla() {
-            const tabla = document.getElementById('tablaClientes');
-            tabla.innerHTML = `<tr>
-                <th>Placa</th>
-                <th>Marca</th>
-                <th>Tiempo en Parqueo</th>
-                <th>Acciones</th>
-            </tr>`;
-
-            clientes.forEach((cliente, index) => {
-                const tiempoEnParqueo = new Date().getTime() - cliente.horaEntrada;
-                const horas = Math.floor(tiempoEnParqueo / 3600000);
-                const minutos = Math.floor((tiempoEnParqueo % 3600000) / 60000);
-                const segundos = Math.floor((tiempoEnParqueo % 60000) / 1000);
-
-                const fila = document.createElement('tr');
-                fila.innerHTML = `
-                    <td class="placa">${cliente.placa}</td>
-                    <td class="marca">${cliente.marca}</td>
-                    <td class="timer">${horas}:${minutos}:${segundos}</td>
-                    <td>
-                        <button onclick="verTarifa(${index})">Ver Tarifa</button>
-                        <button onclick="sacarCliente(${index})">Sacar</button>
-                    </td>
+            vehiculosRetirados.forEach((vehiculo) => {
+                total += parseFloat(vehiculo.tarifaCobrada);
+                reporteHTML += `
+                    <tr>
+                        <td>${vehiculo.fechaSalida}</td>
+                        <td>${vehiculo.placa}</td>
+                        <td>Q${vehiculo.tarifaCobrada}</td>
+                    </tr>
                 `;
-                tabla.appendChild(fila);
             });
+
+            reporteHTML += `
+                <tr>
+                    <td colspan="2" style="font-weight: bold;">Total del Día</td>
+                    <td style="font-weight: bold;">Q${total.toFixed(2)}</td>
+                </tr>
+                </table>
+            `;
+
+            // Mostrar reporte
+            document.getElementById("reporteCierre").innerHTML = reporteHTML;
+
+            // Eliminar registros de vehículos retirados
+            vehiculosRetirados = [];
+            localStorage.setItem('vehiculosRetirados', JSON.stringify(vehiculosRetirados));
+
+            // Actualizar la tabla de retirados
+            actualizarTablaRetirados();
+
+            alert("Cierre del día completado. Registros eliminados.");
         }
 
-        // Función para ver la tarifa
-        function verTarifa(index) {
-            const cliente = clientes[index];
-            const tiempoEnParqueo = new Date().getTime() - cliente.horaEntrada;
-            const minutosTranscurridos = Math.floor(tiempoEnParqueo / 60000);
-            const tarifa = calcularTarifa(minutosTranscurridos);
-            alert(`La tarifa para el vehículo con placa ${cliente.placa} es Q${tarifa.toFixed(2)}.`);
-        }
-
-        // Función para sacar un cliente y generar el ticket
-        function sacarCliente(index) {
-            const cliente = clientes[index];
-            const tiempoEnParqueo = new Date().getTime() - cliente.horaEntrada;
-            const minutosTranscurridos = Math.floor(tiempoEnParqueo / 60000);
-            const tarifa = calcularTarifa(minutosTranscurridos);
-
-            const confirmacion = confirm(`¿Desea retirar el vehículo con placa ${cliente.placa}? La tarifa es Q${tarifa.toFixed(2)}.`);
-            if (confirmacion) {
-                vehiculosRetirados.unshift({
-                    ...cliente,
-                    tarifaCobrada: tarifa.toFixed(2),
-                    fechaSalida: new Date().toLocaleString()
-                });
-
-                clientes.splice(index, 1);
-                localStorage.setItem('vehiculos', JSON.stringify(clientes));
-                localStorage.setItem('vehiculosRetirados', JSON.stringify(vehiculosRetirados));
-
-                actualizarTabla();
-                actualizarTablaRetirados();
-                imprimirTicket(cliente, tarifa.toFixed(2)); // Generar ticket de salida
-            }
-        }
-
-        // Función para actualizar la tabla de vehículos retirados
+        // Funciones existentes (actualizarTabla, actualizarTablaRetirados, etc.) van aquí
         function actualizarTablaRetirados() {
             const tabla = document.getElementById('tablaVehiculosRetirados');
             tabla.innerHTML = `<tr>
@@ -376,29 +168,8 @@
             });
         }
 
-        // Función para imprimir la venta de vehículos retirados
-        function imprimirVenta(placa, tarifaCobrada) {
-            const contenido = `
-                <div class="ticket">
-                    <h2>Factura de Venta</h2>
-                    <p><strong>Placa:</strong> ${placa}</p>
-                    <p><strong>Tarifa Cobrada:</strong> Q${tarifaCobrada}</p>
-                    <div class="line"></div>
-                    <p class="total">Total a Pagar: Q${tarifaCobrada}</p>
-                    <p>Gracias por utilizar nuestro servicio de parqueo.</p>
-                </div>
-            `;
-            const ventana = window.open('', '', 'width=350,height=500');
-            ventana.document.write(contenido);
-            ventana.document.close();
-            ventana.print(); // Imprimir la venta
-        }
-
-        // Inicializamos las tablas y el cronómetro al cargar la página
         window.onload = function() {
-            actualizarTabla();
             actualizarTablaRetirados();
-            setInterval(actualizarTabla, 1000);
         };
     </script>
 </body>
