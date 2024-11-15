@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Clientes de Parqueo | MarckBusiness</title>
     <style>
-        /* Tu CSS original va aquí */
+        /* Tu CSS original */
         body {
             background: linear-gradient(to bottom, #333, #222);
             color: #FFF;
@@ -79,7 +79,6 @@
     <!-- Botón para cierre del día -->
     <div class="cierre">
         <button onclick="hacerCierre()">Cierre del Día</button>
-        <div id="reporteCierre" style="margin-top: 20px;"></div>
     </div>
 
     <script>
@@ -98,11 +97,11 @@
                 return;
             }
 
-            // Generar reporte del cierre del día
+            // Generar el contenido del ticket
             let total = 0;
-            let reporteHTML = `
-                <h3>Reporte del Cierre del Día</h3>
-                <table>
+            let ticketContent = `
+                <h1>Ticket de Cierre del Día</h1>
+                <table border="1" style="width: 100%; text-align: center; border-collapse: collapse;">
                     <tr>
                         <th>Hora de Salida</th>
                         <th>Placa</th>
@@ -112,7 +111,7 @@
 
             vehiculosRetirados.forEach((vehiculo) => {
                 total += parseFloat(vehiculo.tarifaCobrada);
-                reporteHTML += `
+                ticketContent += `
                     <tr>
                         <td>${vehiculo.fechaSalida}</td>
                         <td>${vehiculo.placa}</td>
@@ -121,16 +120,37 @@
                 `;
             });
 
-            reporteHTML += `
+            ticketContent += `
                 <tr>
                     <td colspan="2" style="font-weight: bold;">Total del Día</td>
                     <td style="font-weight: bold;">Q${total.toFixed(2)}</td>
                 </tr>
                 </table>
+                <p style="text-align: center; margin-top: 20px;">Gracias por usar MarckBusiness</p>
             `;
 
-            // Mostrar reporte
-            document.getElementById("reporteCierre").innerHTML = reporteHTML;
+            // Abrir el ticket en una nueva ventana
+            const ticketWindow = window.open('', '_blank');
+            ticketWindow.document.write(`
+                <!DOCTYPE html>
+                <html lang="es">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Ticket de Cierre</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; text-align: center; }
+                        table { margin: 20px auto; border-collapse: collapse; width: 80%; }
+                        th, td { border: 1px solid black; padding: 8px; }
+                        th { background-color: #4CAF50; color: white; }
+                    </style>
+                </head>
+                <body>
+                    ${ticketContent}
+                </body>
+                </html>
+            `);
+            ticketWindow.document.close();
+            ticketWindow.print();
 
             // Eliminar registros de vehículos retirados
             vehiculosRetirados = [];
@@ -139,7 +159,7 @@
             // Actualizar la tabla de retirados
             actualizarTablaRetirados();
 
-            alert("Cierre del día completado. Registros eliminados.");
+            alert("Cierre del día completado. Registros eliminados y ticket generado.");
         }
 
         // Funciones existentes (actualizarTabla, actualizarTablaRetirados, etc.) van aquí
