@@ -7,91 +7,71 @@
     <style>
         /* Estilos generales */
         body {
-            background: linear-gradient(to bottom, #f5f5f5, #eaeaea);
-            color: #333;
+            background: linear-gradient(to bottom, #333, #222);
+            color: #FFF;
             font-family: 'Arial', sans-serif;
         }
         header {
-            background-color: #004aad; /* Azul tecnológico */
+            background-color: #4CAF50;
             padding: 20px;
             text-align: center;
         }
         header img {
-            max-width: 150px;
-            height: auto;
-        }
-        h1, h2 {
-            color: #ff8300; /* Naranja */
+            width: 150px; /* Ajusta el tamaño del logo */
+            margin-bottom: 10px;
         }
         button {
-            background-color: #004aad; /* Azul tecnológico */
+            background-color: #4CAF50;
             color: white;
             border: none;
             padding: 10px 20px;
             cursor: pointer;
             border-radius: 5px;
-            font-size: 14px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
         }
         button:hover {
-            background-color: #ff8300; /* Naranja */
-            transform: translateY(-2px);
+            background-color: #45a049;
         }
         table {
-            width: 90%;
-            margin: 20px auto;
+            width: 100%;
+            margin-top: 20px;
             border-collapse: collapse;
-            background-color: #fff;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
         }
         th, td {
             border: 1px solid #ddd;
-            padding: 10px;
+            padding: 8px;
             text-align: center;
-            font-size: 14px;
         }
         th {
-            background-color: #004aad; /* Azul tecnológico */
+            background-color: #4CAF50;
             color: white;
         }
         input {
-            padding: 10px;
-            margin: 10px;
+            padding: 8px;
+            margin: 5px;
             border-radius: 5px;
             border: 1px solid #ddd;
-            width: 80%;
-            font-size: 14px;
         }
         .formulario {
             margin: 20px auto;
             text-align: center;
-            padding: 20px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            max-width: 600px;
         }
         .cierre {
-            text-align: center;
-            margin: 20px;
+            margin: 20px auto;
+            max-width: 600px;
         }
         footer {
-            background-color: #004aad; /* Azul tecnológico */
-            color: white;
             text-align: center;
-            padding: 10px 0;
-            font-family: Candara, sans-serif;
-            font-size: 14px;
+            margin-top: 40px;
+            color: #FFF;
+            font-family: 'Candara', sans-serif;
         }
     </style>
 </head>
 <body>
     <header>
-        <!-- Logo de la marca -->
-        <img src="images/Diseño sin título.png" alt="Logo MarckBusiness">
+        <img src="images/diseno_sin_titulo.png" alt="Logo MarckBusiness"> <!-- Aquí se carga el logo -->
+        <h1>MarckBusiness</h1>
+        <p>Soluciones Sin Límites</p>
     </header>
 
     <!-- Formulario para ingresar vehículos -->
@@ -131,11 +111,6 @@
         <button onclick="hacerCierre()">Cierre del Día</button>
     </div>
 
-    <!-- Derechos reservados -->
-    <footer>
-        © 2024 MarckBusiness. Todos los derechos reservados.
-    </footer>
-
     <script>
         let clientes = JSON.parse(localStorage.getItem('vehiculos')) || [];
         let vehiculosRetirados = JSON.parse(localStorage.getItem('vehiculosRetirados')) || [];
@@ -169,6 +144,77 @@
 
             actualizarTabla();
             actualizarTablaRetirados();
+        }
+
+        function hacerCierre() {
+            const clave = prompt("Ingrese la clave para realizar el cierre del día:");
+            if (clave !== "Multicars") {
+                alert("Clave incorrecta. No se puede realizar el cierre.");
+                return;
+            }
+
+            if (vehiculosRetirados.length === 0) {
+                alert("No hay registros de vehículos retirados para el cierre.");
+                return;
+            }
+
+            let total = 0;
+            let ticketContent = `
+                <h1>Ticket de Cierre del Día</h1>
+                <table border="1" style="width: 100%; text-align: center; border-collapse: collapse;">
+                    <tr>
+                        <th>Hora de Salida</th>
+                        <th>Placa</th>
+                        <th>Tarifa Cobrada</th>
+                    </tr>
+            `;
+
+            vehiculosRetirados.forEach((vehiculo) => {
+                total += parseFloat(vehiculo.tarifaCobrada);
+                ticketContent += `
+                    <tr>
+                        <td>${vehiculo.fechaSalida}</td>
+                        <td>${vehiculo.placa}</td>
+                        <td>Q${vehiculo.tarifaCobrada}</td>
+                    </tr>
+                `;
+            });
+
+            ticketContent += `
+                <tr>
+                    <td colspan="2" style="font-weight: bold;">Total del Día</td>
+                    <td style="font-weight: bold;">Q${total.toFixed(2)}</td>
+                </tr>
+                </table>
+                <p style="text-align: center; margin-top: 20px;">Gracias por usar MarckBusiness</p>
+            `;
+
+            const ticketWindow = window.open('', '_blank');
+            ticketWindow.document.write(`
+                <!DOCTYPE html>
+                <html lang="es">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Ticket de Cierre</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; text-align: center; }
+                        table { margin: 20px auto; border-collapse: collapse; width: 80%; }
+                        th, td { border: 1px solid black; padding: 8px; }
+                        th { background-color: #4CAF50; color: white; }
+                    </style>
+                </head>
+                <body>
+                    ${ticketContent}
+                </body>
+                </html>
+            `);
+            ticketWindow.document.close();
+            ticketWindow.print();
+
+            vehiculosRetirados = [];
+            localStorage.setItem('vehiculosRetirados', JSON.stringify(vehiculosRetirados));
+            actualizarTablaRetirados();
+            alert("Cierre del día completado.");
         }
 
         function actualizarTabla() {
@@ -209,16 +255,49 @@
                     <td>${cliente.marca}</td>
                     <td>Q${cliente.tarifaCobrada}</td>
                     <td>${cliente.fechaSalida}</td>
-                    <td></td>
+                    <td><button onclick="imprimirVenta('${cliente.placa}', ${cliente.tarifaCobrada})">Imprimir</button></td>
                 `;
                 tabla.appendChild(fila);
             });
         }
 
-        window.onload = function () {
-            actualizarTabla();
-            actualizarTablaRetirados();
-        };
+        function imprimirVenta(placa, tarifa) {
+            const vehiculo = vehiculosRetirados.find(v => v.placa === placa);
+            let ventaContent = `
+                <h1>Ticket de Venta</h1>
+                <p>Placa: ${vehiculo.placa}</p>
+                <p>Marca: ${vehiculo.marca}</p>
+                <p>Tarifa: Q${tarifa}</p>
+                <p>Fecha de Salida: ${vehiculo.fechaSalida}</p>
+            `;
+
+            const ventaWindow = window.open('', '_blank');
+            ventaWindow.document.write(`
+                <!DOCTYPE html>
+                <html lang="es">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Ticket de Venta</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; text-align: center; }
+                    </style>
+                </head>
+                <body>
+                    ${ventaContent}
+                </body>
+                </html>
+            `);
+            ventaWindow.document.close();
+            ventaWindow.print();
+        }
+
+        // Inicializar tablas al cargar la página
+        actualizarTabla();
+        actualizarTablaRetirados();
     </script>
+
+    <footer>
+        <p>&copy; 2024 MarckBusiness. Todos los derechos reservados.</p>
+    </footer>
 </body>
 </html>
