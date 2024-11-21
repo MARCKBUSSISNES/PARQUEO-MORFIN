@@ -171,12 +171,18 @@
             const placa = document.getElementById('placa').value.trim();
             const marca = document.getElementById('marca').value.trim();
 
+            console.log("Intentando ingresar vehículo...");
+            console.log("Placa:", placa);
+            console.log("Marca:", marca);
+
             if (!placa || !marca) {
                 alert('Por favor, complete todos los campos.');
                 return;
             }
 
             const horaIngreso = new Date();
+            console.log("Hora de ingreso:", horaIngreso);
+
             clientes.push({ placa, marca, horaIngreso, cronometroId: startCronometro(horaIngreso) });
             localStorage.setItem('vehiculos', JSON.stringify(clientes));
             actualizarTabla();
@@ -234,19 +240,18 @@
             }
 
             if (vehiculosRetirados.length === 0) {
-                alert("No hay registros de vehículos retirados para el cierre.");
+                alert("No hay registros de vehículos retirados.");
                 return;
             }
 
             let total = 0;
-            let ticketContent = `
-                <h1>Ticket de Cierre del Día</h1>
-                <table border="1" style="width: 100%; text-align: center;">
-                    <tr>
-                        <th>Fecha de Salida</th>
-                        <th>Placa</th>
-                        <th>Tarifa Cobrada</th>
-                    </tr>
+            let ticketContent = "<h2>Resumen del Cierre</h2><table>";
+            ticketContent += `
+                <tr>
+                    <th>Fecha de Salida</th>
+                    <th>Placa</th>
+                    <th>Tarifa Cobrada</th>
+                </tr>
             `;
 
             vehiculosRetirados.forEach(vehiculo => {
