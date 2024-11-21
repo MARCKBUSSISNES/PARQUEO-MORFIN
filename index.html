@@ -7,64 +7,84 @@
     <style>
         /* Estilos generales */
         body {
-            background: linear-gradient(to bottom, #333, #222);
-            color: #FFF;
+            background: linear-gradient(to bottom, #f5f5f5, #eaeaea);
+            color: #333;
             font-family: 'Arial', sans-serif;
         }
         header {
-            background-color: black;
+            background-color: #004aad; /* Azul tecnológico */
             padding: 20px;
             text-align: center;
         }
         header img {
-            max-width: 200px;
+            max-width: 150px;
             height: auto;
         }
+        h1, h2 {
+            color: #ff8300; /* Naranja */
+        }
         button {
-            background-color: #4CAF50;
+            background-color: #004aad; /* Azul tecnológico */
             color: white;
             border: none;
             padding: 10px 20px;
             cursor: pointer;
             border-radius: 5px;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
         }
         button:hover {
-            background-color: #45a049;
+            background-color: #ff8300; /* Naranja */
+            transform: translateY(-2px);
         }
         table {
-            width: 100%;
-            margin-top: 20px;
+            width: 90%;
+            margin: 20px auto;
             border-collapse: collapse;
+            background-color: #fff;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
         }
         th, td {
             border: 1px solid #ddd;
-            padding: 8px;
+            padding: 10px;
             text-align: center;
+            font-size: 14px;
         }
         th {
-            background-color: #4CAF50;
+            background-color: #004aad; /* Azul tecnológico */
             color: white;
         }
         input {
-            padding: 8px;
-            margin: 5px;
+            padding: 10px;
+            margin: 10px;
             border-radius: 5px;
             border: 1px solid #ddd;
+            width: 80%;
+            font-size: 14px;
         }
         .formulario {
             margin: 20px auto;
             text-align: center;
-        }
-        .cierre {
-            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            width: 90%;
             max-width: 600px;
         }
-        footer {
+        .cierre {
             text-align: center;
-            margin-top: 30px;
+            margin: 20px;
+        }
+        footer {
+            background-color: #004aad; /* Azul tecnológico */
+            color: white;
+            text-align: center;
+            padding: 10px 0;
             font-family: Candara, sans-serif;
             font-size: 14px;
-            color: black;
         }
     </style>
 </head>
@@ -117,7 +137,88 @@
     </footer>
 
     <script>
-        // Código JavaScript aquí (sin cambios)
+        let clientes = JSON.parse(localStorage.getItem('vehiculos')) || [];
+        let vehiculosRetirados = JSON.parse(localStorage.getItem('vehiculosRetirados')) || [];
+
+        function ingresarVehiculo() {
+            const placa = document.getElementById('placa').value.trim();
+            const marca = document.getElementById('marca').value.trim();
+
+            if (!placa || !marca) {
+                alert('Por favor, complete todos los campos.');
+                return;
+            }
+
+            clientes.push({ placa, marca, horaIngreso: new Date().toLocaleString() });
+            localStorage.setItem('vehiculos', JSON.stringify(clientes));
+            actualizarTabla();
+            document.getElementById('placa').value = '';
+            document.getElementById('marca').value = '';
+        }
+
+        function retirarVehiculo(placa) {
+            const vehiculo = clientes.find(v => v.placa === placa);
+            const tarifa = Math.floor(Math.random() * 50) + 10; // Simula una tarifa aleatoria entre Q10 y Q50
+            const fechaSalida = new Date().toLocaleString();
+
+            vehiculosRetirados.push({ ...vehiculo, tarifaCobrada: tarifa, fechaSalida });
+            clientes = clientes.filter(v => v.placa !== placa);
+
+            localStorage.setItem('vehiculos', JSON.stringify(clientes));
+            localStorage.setItem('vehiculosRetirados', JSON.stringify(vehiculosRetirados));
+
+            actualizarTabla();
+            actualizarTablaRetirados();
+        }
+
+        function actualizarTabla() {
+            const tabla = document.getElementById('tablaClientes');
+            tabla.innerHTML = `<tr>
+                <th>Placa</th>
+                <th>Marca</th>
+                <th>Tiempo en Parqueo</th>
+                <th>Acciones</th>
+            </tr>`;
+
+            clientes.forEach(cliente => {
+                const fila = document.createElement('tr');
+                fila.innerHTML = `
+                    <td>${cliente.placa}</td>
+                    <td>${cliente.marca}</td>
+                    <td>${cliente.horaIngreso}</td>
+                    <td><button onclick="retirarVehiculo('${cliente.placa}')">Retirar</button></td>
+                `;
+                tabla.appendChild(fila);
+            });
+        }
+
+        function actualizarTablaRetirados() {
+            const tabla = document.getElementById('tablaVehiculosRetirados');
+            tabla.innerHTML = `<tr>
+                <th>Placa</th>
+                <th>Marca</th>
+                <th>Tarifa Cobrada</th>
+                <th>Fecha de Salida</th>
+                <th>Acciones</th>
+            </tr>`;
+
+            vehiculosRetirados.forEach(cliente => {
+                const fila = document.createElement('tr');
+                fila.innerHTML = `
+                    <td>${cliente.placa}</td>
+                    <td>${cliente.marca}</td>
+                    <td>Q${cliente.tarifaCobrada}</td>
+                    <td>${cliente.fechaSalida}</td>
+                    <td></td>
+                `;
+                tabla.appendChild(fila);
+            });
+        }
+
+        window.onload = function () {
+            actualizarTabla();
+            actualizarTablaRetirados();
+        };
     </script>
 </body>
 </html>
