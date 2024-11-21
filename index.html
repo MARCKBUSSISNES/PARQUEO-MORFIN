@@ -1,139 +1,127 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Clientes de Parqueo | MarckBusiness</title>
-    <style>
-        /* Estilos generales */
-        body {
-            background: linear-gradient(to right, #0a1d3d, #1f4e79); /* Azul tecnológico */
-            color: #fff;
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
+<script>
+    let clientes = JSON.parse(localStorage.getItem('vehiculos')) || [];
+    let vehiculosRetirados = JSON.parse(localStorage.getItem('vehiculosRetirados')) || [];
+
+    const tarifaPorMinuto = 0.5; // Tarifa por minuto en Quetzales
+
+    // Función para ingresar un vehículo
+    function ingresarVehiculo() {
+        const placa = document.getElementById('placa').value.trim();
+        const marca = document.getElementById('marca').value.trim();
+
+        console.log("Intentando ingresar vehículo...");
+        console.log("Placa:", placa);
+        console.log("Marca:", marca);
+
+        if (!placa || !marca) {
+            alert('Por favor, complete todos los campos.');
+            return;
         }
 
-        header {
-            background-color: #FF6F00; /* Naranja vibrante */
-            padding: 30px;
-            text-align: center;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+        const horaIngreso = new Date();
+        console.log("Hora de ingreso:", horaIngreso);
+
+        clientes.push({ placa, marca, horaIngreso: horaIngreso.toISOString(), cronometroId: startCronometro(horaIngreso) });
+        localStorage.setItem('vehiculos', JSON.stringify(clientes));
+        actualizarTabla();
+        document.getElementById('placa').value = '';
+        document.getElementById('marca').value = '';
+    }
+
+    // Función para iniciar el cronómetro
+    function startCronometro(horaIngreso) {
+        const cronometroId = setInterval(() => {
+            const tiempoTranscurrido = Math.floor((new Date() - horaIngreso) / 1000 / 60); // En minutos
+            const fila = document.querySelector(`#cliente-${horaIngreso.getTime()}`);
+            if (fila) {
+                fila.querySelector(".tiempo").textContent = `${tiempoTranscurrido} min`;
+            }
+        }, 60000); // Actualizar cada minuto
+        return cronometroId;
+    }
+
+    // Función para retirar un vehículo
+    function retirarVehiculo(placa) {
+        const vehiculo = clientes.find(v => v.placa === placa);
+        const tarifa = calcularTarifa(new Date(vehiculo.horaIngreso));
+        const fechaSalida = new Date().toLocaleString();
+
+        vehiculosRetirados.push({ ...vehiculo, tarifaCobrada: tarifa, fechaSalida });
+        clientes = clientes.filter(v => v.placa !== placa);
+
+        localStorage.setItem('vehiculos', JSON.stringify(clientes));
+        localStorage.setItem('vehiculosRetirados', JSON.stringify(vehiculosRetirados));
+
+        actualizarTabla();
+        actualizarTablaRetirados();
+    }
+
+    // Función para calcular la tarifa
+    function calcularTarifa(horaIngreso) {
+        const tiempoEnParqueo = Math.floor((new Date() - horaIngreso) / 1000 / 60); // En minutos
+        return tiempoEnParqueo * tarifaPorMinuto;
+    }
+
+    // Función para visualizar la tarifa de un vehículo
+    function visualizarTarifa(placa) {
+        const vehiculo = clientes.find(v => v.placa === placa);
+        const tarifa = calcularTarifa(new Date(vehiculo.horaIngreso));
+        alert(`La tarifa actual para el vehículo con placa ${placa} es: Q${tarifa.toFixed(2)}`);
+    }
+
+    // Función para hacer el cierre del día
+    function hacerCierre() {
+        const clave = prompt("Ingrese la clave para realizar el cierre del día:");
+        if (clave !== "Multicars") {
+            alert("Clave incorrecta. No se puede realizar el cierre.");
+            return;
         }
 
-        header img {
-            width: 150px; /* Ajusta el tamaño del logo */
-            margin-bottom: 20px;
+        if (vehiculosRetirados.length === 0) {
+            alert("No hay registros de vehículos retirados.");
+            return;
         }
 
-        header h1 {
-            font-family: 'Candara', sans-serif;
-            font-size: 36px;
-            color: #fff;
-            margin: 10px 0;
-        }
+        let total = 0;
+        let ticketContent = "<h2>Resumen del Cierre</h2><table>";
+        ticketContent += `
+            <tr>
+                <th>Fecha de Salida</th>
+                <th>Placa</th>
+                <th>Tarifa Cobrada</th>
+            </tr>
+        `;
 
-        header p {
-            font-size: 18px;
-            font-weight: bold;
-            color: #FFF;
-        }
+        vehiculosRetirados.forEach(vehiculo => {
+            total += vehiculo.tarifaCobrada;
+            ticketContent += `
+                <tr>
+                    <td>${vehiculo.fechaSalida}</td>
+                    <td>${vehiculo.placa}</td>
+                    <td>Q${vehiculo.tarifaCobrada.toFixed(2)}</td>
+                </tr>
+            `;
+        });
 
-        button {
-            background-color: #FF6F00; /* Naranja */
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            cursor: pointer;
-            border-radius: 5px;
-            font-size: 16px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        }
+        ticketContent += `
+            <tr>
+                <td colspan="2"><strong>Total</strong></td>
+                <td><strong>Q${total.toFixed(2)}</strong></td>
+            </tr>
+        </table>`;
 
-        button:hover {
-            background-color: #E65100;
-        }
+        alert(`El total recaudado es Q${total.toFixed(2)}. Aquí están los detalles:\n\n${ticketContent}`);
 
-        table {
-            width: 100%;
-            margin-top: 20px;
-            border-collapse: collapse;
-            background-color: #1f4e79; /* Azul oscuro */
-            color: white;
-            border-radius: 10px;
-            overflow: hidden;
-        }
+        // Limpiar registros de vehículos retirados
+        vehiculosRetirados = [];
+        localStorage.setItem('vehiculosRetirados', JSON.stringify(vehiculosRetirados));
+        actualizarTablaRetirados();
+    }
 
-        th, td {
-            padding: 15px;
-            text-align: center;
-        }
-
-        th {
-            background-color: #FF6F00; /* Naranja */
-        }
-
-        td {
-            background-color: #263a53;
-        }
-
-        input {
-            padding: 12px;
-            margin: 5px;
-            border-radius: 5px;
-            border: 1px solid #FF6F00;
-            font-size: 16px;
-            color: #333;
-        }
-
-        .formulario {
-            margin: 30px auto;
-            text-align: center;
-            max-width: 500px;
-        }
-
-        .cierre {
-            margin: 40px auto;
-            max-width: 600px;
-            text-align: center;
-        }
-
-        footer {
-            background-color: #263a53;
-            color: white;
-            padding: 10px 0;
-            text-align: center;
-            font-family: 'Candara', sans-serif;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-        }
-
-        footer p {
-            font-size: 14px;
-        }
-
-    </style>
-</head>
-<body>
-    <header>
-        <img src="images/diseno_sin_titulo.png" alt="Logo MarckBusiness">
-        <h1>MarckBusiness</h1>
-        <p>Soluciones Sin Límites</p>
-    </header>
-
-    <!-- Formulario para ingresar vehículos -->
-    <div class="formulario">
-        <h2>Ingresar Vehículo</h2>
-        <input type="text" id="placa" placeholder="Placa">
-        <input type="text" id="marca" placeholder="Marca">
-        <button onclick="ingresarVehiculo()">Ingresar</button>
-    </div>
-
-    <!-- Tablas -->
-    <div class="tabla-section">
-        <h2>Vehículos en el Parqueo</h2>
-        <table id="tablaClientes">
+    // Función para actualizar la tabla de vehículos en parqueo
+    function actualizarTabla() {
+        const tabla = document.getElementById('tablaClientes');
+        tabla.innerHTML = `
             <tr>
                 <th>Placa</th>
                 <th>Marca</th>
@@ -141,10 +129,30 @@
                 <th>Tarifa</th>
                 <th>Acciones</th>
             </tr>
-        </table>
+        `;
+        clientes.forEach((vehiculo) => {
+            const fechaIngreso = new Date(vehiculo.horaIngreso);
+            const tiempoEnParqueo = Math.floor((new Date() - fechaIngreso) / 1000 / 60); // En minutos
+            const fila = document.createElement('tr');
+            fila.id = `cliente-${fechaIngreso.getTime()}`;
+            fila.innerHTML = `
+                <td>${vehiculo.placa}</td>
+                <td>${vehiculo.marca}</td>
+                <td class="tiempo">${tiempoEnParqueo} min</td>
+                <td>Q${calcularTarifa(fechaIngreso).toFixed(2)}</td>
+                <td>
+                    <button onclick="retirarVehiculo('${vehiculo.placa}')">Retirar</button>
+                    <button onclick="visualizarTarifa('${vehiculo.placa}')">Ver Tarifa</button>
+                </td>
+            `;
+            tabla.appendChild(fila);
+        });
+    }
 
-        <h2>Vehículos Retirados</h2>
-        <table id="tablaVehiculosRetirados">
+    // Función para actualizar la tabla de vehículos retirados
+    function actualizarTablaRetirados() {
+        const tabla = document.getElementById('tablaVehiculosRetirados');
+        tabla.innerHTML = `
             <tr>
                 <th>Placa</th>
                 <th>Marca</th>
@@ -152,197 +160,21 @@
                 <th>Fecha de Salida</th>
                 <th>Acciones</th>
             </tr>
-        </table>
-    </div>
-
-    <!-- Botón para cierre del día -->
-    <div class="cierre">
-        <button onclick="hacerCierre()">Cierre del Día</button>
-    </div>
-
-    <script>
-        let clientes = JSON.parse(localStorage.getItem('vehiculos')) || [];
-        let vehiculosRetirados = JSON.parse(localStorage.getItem('vehiculosRetirados')) || [];
-
-        const tarifaPorMinuto = 0.5; // Tarifa por minuto en Quetzales
-
-        // Función para ingresar un vehículo
-        function ingresarVehiculo() {
-            const placa = document.getElementById('placa').value.trim();
-            const marca = document.getElementById('marca').value.trim();
-
-            console.log("Intentando ingresar vehículo...");
-            console.log("Placa:", placa);
-            console.log("Marca:", marca);
-
-            if (!placa || !marca) {
-                alert('Por favor, complete todos los campos.');
-                return;
-            }
-
-            const horaIngreso = new Date();
-            console.log("Hora de ingreso:", horaIngreso);
-
-            clientes.push({ placa, marca, horaIngreso, cronometroId: startCronometro(horaIngreso) });
-            localStorage.setItem('vehiculos', JSON.stringify(clientes));
-            actualizarTabla();
-            document.getElementById('placa').value = '';
-            document.getElementById('marca').value = '';
-        }
-
-        // Función para iniciar el cronómetro
-        function startCronometro(horaIngreso) {
-            const cronometroId = setInterval(() => {
-                const tiempoTranscurrido = Math.floor((new Date() - horaIngreso) / 1000 / 60); // En minutos
-                const fila = document.querySelector(`#cliente-${horaIngreso.getTime()}`);
-                if (fila) {
-                    fila.querySelector(".tiempo").textContent = `${tiempoTranscurrido} min`;
-                }
-            }, 60000); // Actualizar cada minuto
-            return cronometroId;
-        }
-
-        // Función para retirar un vehículo
-        function retirarVehiculo(placa) {
-            const vehiculo = clientes.find(v => v.placa === placa);
-            const tarifa = calcularTarifa(vehiculo.horaIngreso);
-            const fechaSalida = new Date().toLocaleString();
-
-            vehiculosRetirados.push({ ...vehiculo, tarifaCobrada: tarifa, fechaSalida });
-            clientes = clientes.filter(v => v.placa !== placa);
-
-            localStorage.setItem('vehiculos', JSON.stringify(clientes));
-            localStorage.setItem('vehiculosRetirados', JSON.stringify(vehiculosRetirados));
-
-            actualizarTabla();
-            actualizarTablaRetirados();
-        }
-
-        // Función para calcular la tarifa
-        function calcularTarifa(horaIngreso) {
-            const tiempoEnParqueo = Math.floor((new Date() - horaIngreso) / 1000 / 60); // En minutos
-            return tiempoEnParqueo * tarifaPorMinuto;
-        }
-
-        // Función para visualizar la tarifa de un vehículo
-        function visualizarTarifa(placa) {
-            const vehiculo = clientes.find(v => v.placa === placa);
-            const tarifa = calcularTarifa(vehiculo.horaIngreso);
-            alert(`La tarifa actual para el vehículo con placa ${placa} es: Q${tarifa.toFixed(2)}`);
-        }
-
-        // Función para hacer el cierre del día
-        function hacerCierre() {
-            const clave = prompt("Ingrese la clave para realizar el cierre del día:");
-            if (clave !== "Multicars") {
-                alert("Clave incorrecta. No se puede realizar el cierre.");
-                return;
-            }
-
-            if (vehiculosRetirados.length === 0) {
-                alert("No hay registros de vehículos retirados.");
-                return;
-            }
-
-            let total = 0;
-            let ticketContent = "<h2>Resumen del Cierre</h2><table>";
-            ticketContent += `
-                <tr>
-                    <th>Fecha de Salida</th>
-                    <th>Placa</th>
-                    <th>Tarifa Cobrada</th>
-                </tr>
+        `;
+        vehiculosRetirados.forEach((vehiculo) => {
+            const fila = document.createElement('tr');
+            fila.innerHTML = `
+                <td>${vehiculo.placa}</td>
+                <td>${vehiculo.marca}</td>
+                <td>Q${vehiculo.tarifaCobrada.toFixed(2)}</td>
+                <td>${vehiculo.fechaSalida}</td>
+                <td><button onclick="imprimirVenta('${vehiculo.placa}', ${vehiculo.tarifaCobrada})">Imprimir</button></td>
             `;
+            tabla.appendChild(fila);
+        });
+    }
 
-            vehiculosRetirados.forEach(vehiculo => {
-                total += vehiculo.tarifaCobrada;
-                ticketContent += `
-                    <tr>
-                        <td>${vehiculo.fechaSalida}</td>
-                        <td>${vehiculo.placa}</td>
-                        <td>Q${vehiculo.tarifaCobrada.toFixed(2)}</td>
-                    </tr>
-                `;
-            });
-
-            ticketContent += `
-                <tr>
-                    <td colspan="2"><strong>Total</strong></td>
-                    <td><strong>Q${total.toFixed(2)}</strong></td>
-                </tr>
-            </table>`;
-
-            alert(`El total recaudado es Q${total.toFixed(2)}. Aquí están los detalles:\n\n${ticketContent}`);
-
-            // Limpiar registros de vehículos retirados
-            vehiculosRetirados = [];
-            localStorage.setItem('vehiculosRetirados', JSON.stringify(vehiculosRetirados));
-            actualizarTablaRetirados();
-        }
-
-        // Función para actualizar la tabla de vehículos en parqueo
-        function actualizarTabla() {
-            const tabla = document.getElementById('tablaClientes');
-            tabla.innerHTML = `
-                <tr>
-                    <th>Placa</th>
-                    <th>Marca</th>
-                    <th>Tiempo en Parqueo</th>
-                    <th>Tarifa</th>
-                    <th>Acciones</th>
-                </tr>
-            `;
-            clientes.forEach((vehiculo) => {
-                const fechaIngreso = new Date(vehiculo.horaIngreso);
-                const tiempoEnParqueo = Math.floor((new Date() - fechaIngreso) / 1000 / 60); // En minutos
-                const fila = document.createElement('tr');
-                fila.id = `cliente-${vehiculo.horaIngreso.getTime()}`;
-                fila.innerHTML = `
-                    <td>${vehiculo.placa}</td>
-                    <td>${vehiculo.marca}</td>
-                    <td class="tiempo">${tiempoEnParqueo} min</td>
-                    <td>Q${calcularTarifa(vehiculo.horaIngreso).toFixed(2)}</td>
-                    <td>
-                        <button onclick="retirarVehiculo('${vehiculo.placa}')">Retirar</button>
-                        <button onclick="visualizarTarifa('${vehiculo.placa}')">Ver Tarifa</button>
-                    </td>
-                `;
-                tabla.appendChild(fila);
-            });
-        }
-
-        // Función para actualizar la tabla de vehículos retirados
-        function actualizarTablaRetirados() {
-            const tabla = document.getElementById('tablaVehiculosRetirados');
-            tabla.innerHTML = `
-                <tr>
-                    <th>Placa</th>
-                    <th>Marca</th>
-                    <th>Tarifa Cobrada</th>
-                    <th>Fecha de Salida</th>
-                    <th>Acciones</th>
-                </tr>
-            `;
-            vehiculosRetirados.forEach((vehiculo) => {
-                const fila = document.createElement('tr');
-                fila.innerHTML = `
-                    <td>${vehiculo.placa}</td>
-                    <td>${vehiculo.marca}</td>
-                    <td>Q${vehiculo.tarifaCobrada.toFixed(2)}</td>
-                    <td>${vehiculo.fechaSalida}</td>
-                    <td><button onclick="imprimirVenta('${vehiculo.placa}', ${vehiculo.tarifaCobrada})">Imprimir</button></td>
-                `;
-                tabla.appendChild(fila);
-            });
-        }
-
-        // Inicializar tablas al cargar la página
-        actualizarTabla();
-        actualizarTablaRetirados();
-    </script>
-
-    <footer>
-        <p>&copy; 2024 MarckBusiness. Todos los derechos reservados.</p>
-    </footer>
-</body>
-</html>
+    // Inicializar tablas al cargar la página
+    actualizarTabla();
+    actualizarTablaRetirados();
+</script>
