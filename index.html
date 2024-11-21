@@ -9,35 +9,22 @@
         const placa = document.getElementById('placa').value.trim();
         const marca = document.getElementById('marca').value.trim();
 
-        console.log("Intentando ingresar vehículo...");
-        console.log("Placa:", placa);
-        console.log("Marca:", marca);
-
         if (!placa || !marca) {
             alert('Por favor, complete todos los campos.');
             return;
         }
 
-        const horaIngreso = new Date();
-        console.log("Hora de ingreso:", horaIngreso);
+        const horaIngreso = new Date(); // Hora actual
+        const vehiculo = { placa, marca, horaIngreso: horaIngreso.toISOString() }; // Guardamos horaIngreso como ISO string
 
-        clientes.push({ placa, marca, horaIngreso: horaIngreso.toISOString(), cronometroId: startCronometro(horaIngreso) });
-        localStorage.setItem('vehiculos', JSON.stringify(clientes));
+        console.log("Vehículo ingresado:", vehiculo);
+
+        clientes.push(vehiculo);
+        localStorage.setItem('vehiculos', JSON.stringify(clientes)); // Guardamos el array actualizado
+
         actualizarTabla();
         document.getElementById('placa').value = '';
         document.getElementById('marca').value = '';
-    }
-
-    // Función para iniciar el cronómetro
-    function startCronometro(horaIngreso) {
-        const cronometroId = setInterval(() => {
-            const tiempoTranscurrido = Math.floor((new Date() - horaIngreso) / 1000 / 60); // En minutos
-            const fila = document.querySelector(`#cliente-${horaIngreso.getTime()}`);
-            if (fila) {
-                fila.querySelector(".tiempo").textContent = `${tiempoTranscurrido} min`;
-            }
-        }, 60000); // Actualizar cada minuto
-        return cronometroId;
     }
 
     // Función para retirar un vehículo
@@ -67,55 +54,6 @@
         const vehiculo = clientes.find(v => v.placa === placa);
         const tarifa = calcularTarifa(new Date(vehiculo.horaIngreso));
         alert(`La tarifa actual para el vehículo con placa ${placa} es: Q${tarifa.toFixed(2)}`);
-    }
-
-    // Función para hacer el cierre del día
-    function hacerCierre() {
-        const clave = prompt("Ingrese la clave para realizar el cierre del día:");
-        if (clave !== "Multicars") {
-            alert("Clave incorrecta. No se puede realizar el cierre.");
-            return;
-        }
-
-        if (vehiculosRetirados.length === 0) {
-            alert("No hay registros de vehículos retirados.");
-            return;
-        }
-
-        let total = 0;
-        let ticketContent = "<h2>Resumen del Cierre</h2><table>";
-        ticketContent += `
-            <tr>
-                <th>Fecha de Salida</th>
-                <th>Placa</th>
-                <th>Tarifa Cobrada</th>
-            </tr>
-        `;
-
-        vehiculosRetirados.forEach(vehiculo => {
-            total += vehiculo.tarifaCobrada;
-            ticketContent += `
-                <tr>
-                    <td>${vehiculo.fechaSalida}</td>
-                    <td>${vehiculo.placa}</td>
-                    <td>Q${vehiculo.tarifaCobrada.toFixed(2)}</td>
-                </tr>
-            `;
-        });
-
-        ticketContent += `
-            <tr>
-                <td colspan="2"><strong>Total</strong></td>
-                <td><strong>Q${total.toFixed(2)}</strong></td>
-            </tr>
-        </table>`;
-
-        alert(`El total recaudado es Q${total.toFixed(2)}. Aquí están los detalles:\n\n${ticketContent}`);
-
-        // Limpiar registros de vehículos retirados
-        vehiculosRetirados = [];
-        localStorage.setItem('vehiculosRetirados', JSON.stringify(vehiculosRetirados));
-        actualizarTablaRetirados();
     }
 
     // Función para actualizar la tabla de vehículos en parqueo
@@ -175,6 +113,9 @@
     }
 
     // Inicializar tablas al cargar la página
-    actualizarTabla();
-    actualizarTablaRetirados();
+    document.addEventListener('DOMContentLoaded', () => {
+        actualizarTabla();
+        actualizarTablaRetirados();
+    });
 </script>
+
