@@ -166,6 +166,7 @@
 
         const tarifaPorMinuto = 0.5; // Tarifa por minuto en Quetzales
 
+        // Función para ingresar un vehículo
         function ingresarVehiculo() {
             const placa = document.getElementById('placa').value.trim();
             const marca = document.getElementById('marca').value.trim();
@@ -183,6 +184,7 @@
             document.getElementById('marca').value = '';
         }
 
+        // Función para iniciar el cronómetro
         function startCronometro(horaIngreso) {
             const cronometroId = setInterval(() => {
                 const tiempoTranscurrido = Math.floor((new Date() - horaIngreso) / 1000 / 60); // En minutos
@@ -194,6 +196,7 @@
             return cronometroId;
         }
 
+        // Función para retirar un vehículo
         function retirarVehiculo(placa) {
             const vehiculo = clientes.find(v => v.placa === placa);
             const tarifa = calcularTarifa(vehiculo.horaIngreso);
@@ -209,17 +212,20 @@
             actualizarTablaRetirados();
         }
 
+        // Función para calcular la tarifa
         function calcularTarifa(horaIngreso) {
             const tiempoEnParqueo = Math.floor((new Date() - horaIngreso) / 1000 / 60); // En minutos
             return tiempoEnParqueo * tarifaPorMinuto;
         }
 
+        // Función para visualizar la tarifa de un vehículo
         function visualizarTarifa(placa) {
             const vehiculo = clientes.find(v => v.placa === placa);
             const tarifa = calcularTarifa(vehiculo.horaIngreso);
             alert(`La tarifa actual para el vehículo con placa ${placa} es: Q${tarifa.toFixed(2)}`);
         }
 
+        // Función para hacer el cierre del día
         function hacerCierre() {
             const clave = prompt("Ingrese la clave para realizar el cierre del día:");
             if (clave !== "Multicars") {
@@ -235,9 +241,9 @@
             let total = 0;
             let ticketContent = `
                 <h1>Ticket de Cierre del Día</h1>
-                <table border="1" style="width: 100%; text-align: center; border-collapse: collapse;">
+                <table border="1" style="width: 100%; text-align: center;">
                     <tr>
-                        <th>Hora de Salida</th>
+                        <th>Fecha de Salida</th>
                         <th>Placa</th>
                         <th>Tarifa Cobrada</th>
                     </tr>
@@ -269,6 +275,7 @@
             actualizarTablaRetirados();
         }
 
+        // Función para actualizar la tabla de vehículos en parqueo
         function actualizarTabla() {
             const tabla = document.getElementById('tablaClientes');
             tabla.innerHTML = `
@@ -299,6 +306,7 @@
             });
         }
 
+        // Función para actualizar la tabla de vehículos retirados
         function actualizarTablaRetirados() {
             const tabla = document.getElementById('tablaVehiculosRetirados');
             tabla.innerHTML = `
