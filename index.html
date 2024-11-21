@@ -138,6 +138,7 @@
                 <th>Placa</th>
                 <th>Marca</th>
                 <th>Tiempo en Parqueo</th>
+                <th>Tarifa</th>
                 <th>Acciones</th>
             </tr>
         </table>
@@ -163,6 +164,8 @@
         let clientes = JSON.parse(localStorage.getItem('vehiculos')) || [];
         let vehiculosRetirados = JSON.parse(localStorage.getItem('vehiculosRetirados')) || [];
 
+        const tarifaPorMinuto = 0.5; // Tarifa por minuto en Quetzales
+
         function ingresarVehiculo() {
             const placa = document.getElementById('placa').value.trim();
             const marca = document.getElementById('marca').value.trim();
@@ -172,16 +175,28 @@
                 return;
             }
 
-            clientes.push({ placa, marca, horaIngreso: new Date().toLocaleString() });
+            const horaIngreso = new Date();
+            clientes.push({ placa, marca, horaIngreso, cronometroId: startCronometro(horaIngreso) });
             localStorage.setItem('vehiculos', JSON.stringify(clientes));
             actualizarTabla();
             document.getElementById('placa').value = '';
             document.getElementById('marca').value = '';
         }
 
+        function startCronometro(horaIngreso) {
+            const cronometroId = setInterval(() => {
+                const tiempoTranscurrido = Math.floor((new Date() - horaIngreso) / 1000 / 60); // En minutos
+                const fila = document.querySelector(`#cliente-${horaIngreso.getTime()}`);
+                if (fila) {
+                    fila.querySelector(".tiempo").textContent = `${tiempoTranscurrido} min`;
+                }
+            }, 60000); // Actualizar cada minuto
+            return cronometroId;
+        }
+
         function retirarVehiculo(placa) {
             const vehiculo = clientes.find(v => v.placa === placa);
-            const tarifa = Math.floor(Math.random() * 50) + 10; // Simula una tarifa aleatoria entre Q10 y Q50
+            const tarifa = calcularTarifa(vehiculo.horaIngreso);
             const fechaSalida = new Date().toLocaleString();
 
             vehiculosRetirados.push({ ...vehiculo, tarifaCobrada: tarifa, fechaSalida });
@@ -192,6 +207,17 @@
 
             actualizarTabla();
             actualizarTablaRetirados();
+        }
+
+        function calcularTarifa(horaIngreso) {
+            const tiempoEnParqueo = Math.floor((new Date() - horaIngreso) / 1000 / 60); // En minutos
+            return tiempoEnParqueo * tarifaPorMinuto;
+        }
+
+        function visualizarTarifa(placa) {
+            const vehiculo = clientes.find(v => v.placa === placa);
+            const tarifa = calcularTarifa(vehiculo.horaIngreso);
+            alert(`La tarifa actual para el vehículo con placa ${placa} es: Q${tarifa.toFixed(2)}`);
         }
 
         function hacerCierre() {
@@ -217,45 +243,30 @@
                     </tr>
             `;
 
-            vehiculosRetirados.forEach((vehiculo) => {
-                total += parseFloat(vehiculo.tarifaCobrada);
+            vehiculosRetirados.forEach(vehiculo => {
+                total += vehiculo.tarifaCobrada;
                 ticketContent += `
                     <tr>
                         <td>${vehiculo.fechaSalida}</td>
                         <td>${vehiculo.placa}</td>
-                        <td>Q${vehiculo.tarifaCobrada}</td>
+                        <td>Q${vehiculo.tarifaCobrada.toFixed(2)}</td>
                     </tr>
                 `;
             });
 
             ticketContent += `
                 <tr>
-                    <td colspan="2" style="font-weight: bold;">Total del Día</td>
-                    <td style="font-weight: bold;">Q${total.toFixed(2)}</td>
+                    <td colspan="2"><strong>Total</strong></td>
+                    <td><strong>Q${total.toFixed(2)}</strong></td>
                 </tr>
-                </table>
-                <p style="text-align: center; margin-top: 20px;">Gracias por usar MarckBusiness</p>
-            `;
+            </table>`;
 
-            const ticketWindow = window.open('', '_blank');
-            ticketWindow.document.write(`
-                <!DOCTYPE html>
-                <html lang="es">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>Ticket de Cierre</title>
-                    <style>
-                        body { font-family: Arial, sans-serif; text-align: center; }
-                        table { margin: 20px auto; border-collapse: collapse; width: 80%; }
-                        th, td { border: 1px solid #000; padding: 8px; }
-                    </style>
-                </head>
-                <body>
-                    ${ticketContent}
-                </body>
-                </html>
-            `);
-            ticketWindow.document.close();
+            alert(`El total recaudado es Q${total.toFixed(2)}. Aquí están los detalles:\n\n${ticketContent}`);
+
+            // Limpiar registros de vehículos retirados
+            vehiculosRetirados = [];
+            localStorage.setItem('vehiculosRetirados', JSON.stringify(vehiculosRetirados));
+            actualizarTablaRetirados();
         }
 
         function actualizarTabla() {
@@ -265,18 +276,24 @@
                     <th>Placa</th>
                     <th>Marca</th>
                     <th>Tiempo en Parqueo</th>
+                    <th>Tarifa</th>
                     <th>Acciones</th>
                 </tr>
             `;
             clientes.forEach((vehiculo) => {
-                const fila = document.createElement('tr');
                 const fechaIngreso = new Date(vehiculo.horaIngreso);
                 const tiempoEnParqueo = Math.floor((new Date() - fechaIngreso) / 1000 / 60); // En minutos
+                const fila = document.createElement('tr');
+                fila.id = `cliente-${vehiculo.horaIngreso.getTime()}`;
                 fila.innerHTML = `
                     <td>${vehiculo.placa}</td>
                     <td>${vehiculo.marca}</td>
-                    <td>${tiempoEnParqueo} min</td>
-                    <td><button onclick="retirarVehiculo('${vehiculo.placa}')">Retirar</button></td>
+                    <td class="tiempo">${tiempoEnParqueo} min</td>
+                    <td>Q${calcularTarifa(vehiculo.horaIngreso).toFixed(2)}</td>
+                    <td>
+                        <button onclick="retirarVehiculo('${vehiculo.placa}')">Retirar</button>
+                        <button onclick="visualizarTarifa('${vehiculo.placa}')">Ver Tarifa</button>
+                    </td>
                 `;
                 tabla.appendChild(fila);
             });
@@ -298,42 +315,12 @@
                 fila.innerHTML = `
                     <td>${vehiculo.placa}</td>
                     <td>${vehiculo.marca}</td>
-                    <td>Q${vehiculo.tarifaCobrada}</td>
+                    <td>Q${vehiculo.tarifaCobrada.toFixed(2)}</td>
                     <td>${vehiculo.fechaSalida}</td>
                     <td><button onclick="imprimirVenta('${vehiculo.placa}', ${vehiculo.tarifaCobrada})">Imprimir</button></td>
                 `;
                 tabla.appendChild(fila);
             });
-        }
-
-        function imprimirVenta(placa, tarifa) {
-            const vehiculo = vehiculosRetirados.find(v => v.placa === placa);
-            let ventaContent = `
-                <h1>Ticket de Venta</h1>
-                <p>Placa: ${vehiculo.placa}</p>
-                <p>Marca: ${vehiculo.marca}</p>
-                <p>Tarifa: Q${tarifa}</p>
-                <p>Fecha de Salida: ${vehiculo.fechaSalida}</p>
-            `;
-
-            const ventaWindow = window.open('', '_blank');
-            ventaWindow.document.write(`
-                <!DOCTYPE html>
-                <html lang="es">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>Ticket de Venta</title>
-                    <style>
-                        body { font-family: Arial, sans-serif; text-align: center; }
-                    </style>
-                </head>
-                <body>
-                    ${ventaContent}
-                </body>
-                </html>
-            `);
-            ventaWindow.document.close();
-            ventaWindow.print();
         }
 
         // Inicializar tablas al cargar la página
