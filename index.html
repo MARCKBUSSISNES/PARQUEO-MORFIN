@@ -55,6 +55,16 @@
             margin: 20px auto;
             max-width: 600px;
         }
+        .footer {
+            background-color: black;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-family: 'Candara', sans-serif;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
     </style>
 </head>
 <body>
@@ -66,7 +76,7 @@
     <!-- Formulario para ingresar vehículos -->
     <div class="formulario">
         <h2>Ingresar Vehículo</h2>
-        <input type="text" id="placa" placeholder="Placa">
+        <input type="text" id="placa" placeholder="Placa (Alfanumérica)">
         <input type="text" id="marca" placeholder="Marca">
         <button onclick="ingresarVehiculo()">Ingresar</button>
     </div>
@@ -100,12 +110,17 @@
         <button onclick="hacerCierre()">Cierre del Día</button>
     </div>
 
+    <!-- Derechos reservados -->
+    <div class="footer">
+        © 2024 MarckBusiness. Todos los derechos reservados.
+    </div>
+
     <script>
         let clientes = JSON.parse(localStorage.getItem('vehiculos')) || [];
         let vehiculosRetirados = JSON.parse(localStorage.getItem('vehiculosRetirados')) || [];
 
         function ingresarVehiculo() {
-            const placa = document.getElementById('placa').value.trim();
+            const placa = document.getElementById('placa').value.trim().toUpperCase();
             const marca = document.getElementById('marca').value.trim();
 
             if (!placa || !marca) {
@@ -113,7 +128,17 @@
                 return;
             }
 
-            clientes.push({ placa, marca, horaIngreso: new Date().toLocaleString() });
+            if (!/^[A-Z0-9]+$/i.test(placa)) {
+                alert('La placa debe ser alfanumérica.');
+                return;
+            }
+
+            if (clientes.some(cliente => cliente.placa === placa)) {
+                alert('Este vehículo ya está registrado.');
+                return;
+            }
+
+            clientes.push({ placa, marca, horaIngreso: new Date().toISOString() });
             localStorage.setItem('vehiculos', JSON.stringify(clientes));
             actualizarTabla();
             document.getElementById('placa').value = '';
@@ -122,7 +147,7 @@
 
         function retirarVehiculo(placa) {
             const vehiculo = clientes.find(v => v.placa === placa);
-            const tarifa = Math.floor(Math.random() * 50) + 10; // Simula una tarifa aleatoria entre Q10 y Q50
+            const tarifa = calcularTarifa(vehiculo.horaIngreso);
             const fechaSalida = new Date().toLocaleString();
 
             vehiculosRetirados.push({ ...vehiculo, tarifaCobrada: tarifa, fechaSalida });
@@ -133,6 +158,13 @@
 
             actualizarTabla();
             actualizarTablaRetirados();
+        }
+
+        function calcularTarifa(horaIngreso) {
+            const ahora = new Date();
+            const ingreso = new Date(horaIngreso);
+            const horas = Math.ceil((ahora - ingreso) / (1000 * 60 * 60));
+            return horas * 10; // Q10 por hora
         }
 
         function hacerCierre() {
@@ -216,15 +248,25 @@
             </tr>`;
 
             clientes.forEach(cliente => {
+                const tiempoTranscurrido = calcularTiempoTranscurrido(cliente.horaIngreso);
                 const fila = document.createElement('tr');
                 fila.innerHTML = `
                     <td>${cliente.placa}</td>
                     <td>${cliente.marca}</td>
-                    <td>${cliente.horaIngreso}</td>
+                    <td>${tiempoTranscurrido}</td>
                     <td><button onclick="retirarVehiculo('${cliente.placa}')">Retirar</button></td>
                 `;
                 tabla.appendChild(fila);
             });
+        }
+
+        function calcularTiempoTranscurrido(horaIngreso) {
+            const ahora = new Date();
+            const ingreso = new Date(horaIngreso);
+            const diferencia = ahora - ingreso; // Milisegundos
+            const horas = Math.floor(diferencia / (1000 * 60 * 60));
+            const minutos = Math.floor((diferencia % (1000 * 60 * 60)) / (1000 * 60));
+            return `${horas}h ${minutos}m`;
         }
 
         function actualizarTablaRetirados() {
@@ -237,23 +279,21 @@
                 <th>Acciones</th>
             </tr>`;
 
-            vehiculosRetirados.forEach(cliente => {
+            vehiculosRetirados.forEach(vehiculo => {
                 const fila = document.createElement('tr');
                 fila.innerHTML = `
-                    <td>${cliente.placa}</td>
-                    <td>${cliente.marca}</td>
-                    <td>Q${cliente.tarifaCobrada}</td>
-                    <td>${cliente.fechaSalida}</td>
-                    <td><button onclick="imprimirVenta('${cliente.placa}', ${cliente.tarifaCobrada})">Imprimir Venta</button></td>
+                    <td>${vehiculo.placa}</td>
+                    <td>${vehiculo.marca}</td>
+                    <td>Q${vehiculo.tarifaCobrada}</td>
+                    <td>${vehiculo.fechaSalida}</td>
+                    <td></td>
                 `;
                 tabla.appendChild(fila);
             });
         }
 
-        window.onload = function() {
-            actualizarTabla();
-            actualizarTablaRetirados();
-        };
+        actualizarTabla();
+        actualizarTablaRetirados();
     </script>
 </body>
 </html>
