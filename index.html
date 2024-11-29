@@ -160,7 +160,7 @@
         <h2>Ingresar Vehículo</h2>
         <input type="text" id="placa" placeholder="Placa">
         <input type="text" id="marca" placeholder="Marca">
-        <button onclick="ingresarVehiculo()">Ingresar</button>
+        <button id="btnIngresar">Ingresar</button>
     </div>
 
     <!-- Tablas -->
@@ -254,10 +254,11 @@
         // Función para hacer el cierre del día
         function hacerCierre() {
             const clave = prompt("Ingrese la clave para realizar el cierre del día:");
-            if (clave !== "Multicars") {
+            if (clave !== "Multimedia") {
                 alert("Clave incorrecta.");
                 return;
             }
+
             let total = 0;
             vehiculosRetirados.forEach(vehiculo => {
                 total += vehiculo.tarifaCobrada;
@@ -265,7 +266,7 @@
             alert(`Cierre del Día\nTotal Cobrado: Q${total.toFixed(2)}`);
         }
 
-        // Funciones para actualizar las tablas de la interfaz
+        // Función para actualizar la tabla de clientes
         function actualizarTabla() {
             const tablaClientes = document.getElementById('tablaClientes');
             tablaClientes.innerHTML = `
@@ -292,6 +293,7 @@
             });
         }
 
+        // Función para actualizar la tabla de vehículos retirados
         function actualizarTablaRetirados() {
             const tablaRetirados = document.getElementById('tablaVehiculosRetirados');
             tablaRetirados.innerHTML = `
@@ -303,7 +305,6 @@
                     <th>Acciones</th>
                 </tr>
             `;
-
             vehiculosRetirados.forEach(vehiculo => {
                 const fila = document.createElement('tr');
                 fila.innerHTML = `
@@ -320,6 +321,23 @@
         // Inicializar tablas
         actualizarTabla();
         actualizarTablaRetirados();
+
+        // Evento del botón de ingresar vehículo
+        document.getElementById('btnIngresar').addEventListener('click', ingresarVehiculo);
+
+        // Hacer que el botón funcione también al presionar Enter
+        document.getElementById('placa').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                ingresarVehiculo();
+            }
+        });
+
+        document.getElementById('marca').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                ingresarVehiculo();
+            }
+        });
     </script>
 </body>
 </html>
+
