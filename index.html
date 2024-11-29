@@ -13,7 +13,6 @@
             padding: 0;
         }
 
-        /* Estilo para el encabezado */
         .encabezado {
             background-color: #FF6F00;
             color: white;
@@ -22,12 +21,11 @@
             font-size: 36px;
         }
 
-        /* Estilo para la imagen en la esquina superior izquierda */
         .imagen-izquierda {
             position: fixed;
             top: 10px;
             left: 10px;
-            width: 150px; /* Aumenté el tamaño de la imagen */
+            width: 150px;
             height: auto;
             z-index: 10;
         }
@@ -106,8 +104,8 @@
 
         /* Estilo para el ticket */
         .ticket {
-            width: 80mm;
-            margin: 20px auto;
+            width: 80mm; /* Ancho adecuado para impresora de 80mm */
+            margin: 0;
             padding: 10px;
             border: 1px dashed #FF6F00;
             text-align: center;
@@ -115,6 +113,7 @@
             background-color: white;
             color: black;
             font-family: "Courier New", Courier, monospace;
+            line-height: 1.5;
         }
 
         .ticket img {
@@ -244,7 +243,7 @@
             } else if (tiempoEnParqueo <= 635) {
                 return 85.00; // Q85.00
             } else if (tiempoEnParqueo <= 665) {
-                return 88.00; // Q88.00
+                return 90.00; // Q90.00
             } else if (tiempoEnParqueo <= 695) {
                 return 93.00; // Q93.00
             } else if (tiempoEnParqueo <= 725) {
@@ -322,7 +321,7 @@
             `;
             document.body.appendChild(ticket);
 
-            // Opcional: Si deseas imprimir el ticket automáticamente
+            // Imprimir automáticamente en la impresora térmica
             window.print();
         }
 
