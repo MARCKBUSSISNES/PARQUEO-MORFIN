@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Vehiculos (MULTICARS/PARQUEO)</title>
+    <title>Registro de Vehículos en el Parqueo</title>
     <style>
         body {
             background: linear-gradient(to right, #0a1d3d, #1f4e79);
@@ -13,33 +13,12 @@
             padding: 0;
         }
 
-        header {
-            background-color: #FF6F00;
-            text-align: center;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Estilo para la imagen en el encabezado */
-        header img {
-            width: 100%;
-            height: 300px; /* Aumenté la altura de la imagen */
-            object-fit: cover;
-        }
-
-        /* Estilo para el texto en el encabezado */
-        header h1 {
-            font-size: 36px;
-            margin-top: -60px; /* Ajuste para que el texto se vea arriba de la imagen */
-            color: white;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        }
-
         /* Estilo para la imagen en la esquina superior izquierda */
         .imagen-izquierda {
             position: fixed;
             top: 10px;
             left: 10px;
-            width: 100px; /* Ajusta el tamaño de la imagen */
+            width: 150px; /* Aumenté el tamaño de la imagen */
             height: auto;
             z-index: 10;
         }
@@ -116,16 +95,34 @@
             margin: 0;
         }
 
+        /* Estilo para el ticket */
+        .ticket {
+            width: 80mm;
+            margin: 20px auto;
+            padding: 10px;
+            border: 1px dashed #FF6F00;
+            text-align: center;
+            font-size: 18px;
+            background-color: white;
+            color: black;
+            font-family: "Courier New", Courier, monospace;
+        }
+
+        .ticket img {
+            width: 60mm;
+            height: auto;
+        }
+
+        .ticket p {
+            margin: 5px;
+            font-size: 16px;
+        }
+
     </style>
 </head>
 <body>
     <!-- Imagen en la esquina superior izquierda -->
     <img src="IMAGEN1.jpg" alt="Imagen de Encabezado" class="imagen-izquierda">
-
-    <header>
-        <h1>MULTICARS</h1> <!-- Título "MULTICARS" arriba de la imagen -->
-        <img src="IMAGEN1.jpg" alt="Encabezado del Parqueo">
-    </header>
 
     <!-- Formulario para ingresar vehículos -->
     <div class="formulario">
@@ -175,6 +172,9 @@
             // Limpiar los campos del formulario
             document.getElementById('placa').value = '';
             document.getElementById('marca').value = '';
+
+            // Mostrar el ticket de parqueo
+            mostrarTicket(placa, marca, horaIngreso);
 
             // Actualizar la tabla
             actualizarTabla();
@@ -248,8 +248,6 @@
                     <th>Acciones</th>
                 </tr>
             `;
-
-            // Llenar la tabla con los vehículos registrados
             clientes.forEach(cliente => {
                 const tiempoTranscurrido = new Date() - cliente.horaIngreso;
                 const tiempoEnSegundos = Math.floor(tiempoTranscurrido / 1000);
@@ -283,6 +281,24 @@
                     document.getElementById(`tiempo-${cliente.placa}`).textContent = tiempoFormateado;
                 }, 1000);
             });
+        }
+
+        // Función para generar y mostrar el ticket de parqueo
+        function mostrarTicket(placa, marca, horaIngreso) {
+            const ticket = document.createElement('div');
+            ticket.classList.add('ticket');
+
+            const horaFormateada = new Date(horaIngreso).toLocaleString();
+            ticket.innerHTML = `
+                <img src="IMAGEN1.jpg" alt="Logo">
+                <p><strong>Ticket de Parqueo</strong></p>
+                <p>Placa: ${placa}</p>
+                <p>Marca: ${marca}</p>
+                <p>Hora de ingreso: ${horaFormateada}</p>
+                <p>Tarifa: Q${calcularTarifa(horaIngreso).toFixed(2)}</p>
+                <p>Gracias por preferirnos</p>
+            `;
+            document.body.appendChild(ticket);
         }
 
         // Función para retirar un vehículo
