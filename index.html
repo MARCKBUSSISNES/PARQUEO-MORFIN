@@ -15,15 +15,23 @@
 
         header {
             background-color: #FF6F00;
-            padding: 20px;
             text-align: center;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
         }
 
+        /* Estilo para la imagen en el encabezado */
         header img {
             width: 100%;
-            max-height: 200px; /* Ajusta el tamaño máximo de la imagen */
+            height: 300px; /* Aumenté la altura de la imagen */
             object-fit: cover;
+        }
+
+        /* Estilo para el texto en el encabezado */
+        header h1 {
+            font-size: 36px;
+            margin-top: -60px; /* Ajuste para que el texto se vea arriba de la imagen */
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
 
         /* Estilo para la imagen en la esquina superior izquierda */
@@ -115,6 +123,7 @@
     <img src="IMAGEN1.jpg" alt="Imagen de Encabezado" class="imagen-izquierda">
 
     <header>
+        <h1>MULTICARS</h1> <!-- Título "MULTICARS" arriba de la imagen -->
         <img src="https://raw.githubusercontent.com/usuario/repositorio/main/images/Dise%C3%B1o%20sin%20titulo.png" alt="Encabezado del Parqueo">
     </header>
 
@@ -239,8 +248,9 @@
                     <th>Acciones</th>
                 </tr>
             `;
+
+            // Llenar la tabla con los vehículos registrados
             clientes.forEach(cliente => {
-                // Creamos un cronómetro dinámico para cada vehículo
                 const tiempoTranscurrido = new Date() - cliente.horaIngreso;
                 const tiempoEnSegundos = Math.floor(tiempoTranscurrido / 1000);
                 const tiempoEnMinutos = Math.floor(tiempoEnSegundos / 60);
@@ -249,7 +259,6 @@
                 const minutosRestantes = tiempoEnMinutos % 60;
                 const horasRestantes = tiempoEnHoras;
 
-                // Formato de tiempo: HH:mm:ss
                 const tiempoFormateado = `${String(horasRestantes).padStart(2, '0')}:${String(minutosRestantes).padStart(2, '0')}:${String(segundosRestantes).padStart(2, '0')}`;
 
                 const fila = document.createElement('tr');
@@ -262,7 +271,6 @@
                 `;
                 tablaClientes.appendChild(fila);
 
-                // Actualizar el cronómetro cada segundo para este vehículo
                 setInterval(() => {
                     const tiempoTranscurrido = new Date() - cliente.horaIngreso;
                     const tiempoEnSegundos = Math.floor(tiempoTranscurrido / 1000);
@@ -272,8 +280,6 @@
                     const minutosRestantes = tiempoEnMinutos % 60;
 
                     const tiempoFormateado = `${String(tiempoEnHoras).padStart(2, '0')}:${String(minutosRestantes).padStart(2, '0')}:${String(segundosRestantes).padStart(2, '0')}`;
-
-                    // Actualizamos el cronómetro de la tabla
                     document.getElementById(`tiempo-${cliente.placa}`).textContent = tiempoFormateado;
                 }, 1000);
             });
@@ -281,16 +287,11 @@
 
         // Función para retirar un vehículo
         function retirarVehiculo(placa) {
-            // Encontrar el vehículo por placa
             const vehiculo = clientes.find(v => v.placa === placa);
             const tarifa = calcularTarifa(vehiculo.horaIngreso);
 
-            // Eliminar el vehículo de la lista
             clientes = clientes.filter(v => v.placa !== placa);
-
             localStorage.setItem('vehiculos', JSON.stringify(clientes));
-
-            // Actualizar la tabla
             actualizarTabla();
 
             alert(`El vehículo con placa ${placa} ha sido retirado. Total a pagar: Q${tarifa.toFixed(2)}`);
@@ -305,10 +306,8 @@
             alert(`Total recaudado hoy: Q${totalRecaudado.toFixed(2)}`);
         }
 
-        // Evento para el botón de ingresar vehículo
         document.getElementById('btnIngresar').addEventListener('click', ingresarVehiculo);
 
-        // Evento para registrar con Enter
         document.getElementById('placa').addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 ingresarVehiculo();
@@ -321,7 +320,6 @@
             }
         });
 
-        // Inicializar la tabla
         actualizarTabla();
     </script>
 </body>
