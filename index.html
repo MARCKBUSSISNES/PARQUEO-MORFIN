@@ -13,6 +13,15 @@
             padding: 0;
         }
 
+        /* Estilo para el encabezado */
+        .encabezado {
+            background-color: #FF6F00;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 36px;
+        }
+
         /* Estilo para la imagen en la esquina superior izquierda */
         .imagen-izquierda {
             position: fixed;
@@ -121,6 +130,11 @@
     </style>
 </head>
 <body>
+    <!-- Encabezado con nombre "Multicars" -->
+    <div class="encabezado">
+        Multicars
+    </div>
+
     <!-- Imagen en la esquina superior izquierda -->
     <img src="IMAGEN1.jpg" alt="Imagen de Encabezado" class="imagen-izquierda">
 
@@ -173,7 +187,7 @@
             document.getElementById('placa').value = '';
             document.getElementById('marca').value = '';
 
-            // Mostrar el ticket de parqueo
+            // Mostrar el ticket de parqueo y ejecutarlo
             mostrarTicket(placa, marca, horaIngreso);
 
             // Actualizar la tabla
@@ -231,12 +245,20 @@
                 return 85.00; // Q85.00
             } else if (tiempoEnParqueo <= 665) {
                 return 88.00; // Q88.00
+            } else if (tiempoEnParqueo <= 695) {
+                return 93.00; // Q93.00
+            } else if (tiempoEnParqueo <= 725) {
+                return 96.00; // Q96.00
+            } else if (tiempoEnParqueo <= 755) {
+                return 101.00; // Q101.00
+            } else if (tiempoEnParqueo <= 785) {
+                return 104.00; // Q104.00
+            } else {
+                return 110.00; // Q110.00
             }
-
-            return 88.00; // Default para tiempos mayores a 665 minutos
         }
 
-        // Función para actualizar la tabla de vehículos
+        // Función para actualizar la tabla
         function actualizarTabla() {
             const tablaClientes = document.getElementById('tablaClientes');
             tablaClientes.innerHTML = `
@@ -299,6 +321,9 @@
                 <p>Gracias por preferirnos</p>
             `;
             document.body.appendChild(ticket);
+
+            // Opcional: Si deseas imprimir el ticket automáticamente
+            window.print();
         }
 
         // Función para retirar un vehículo
