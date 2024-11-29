@@ -212,13 +212,31 @@
             else if (tiempoEnParqueo <= 35) return 5.00;
             else if (tiempoEnParqueo <= 65) return 8.00;
             else if (tiempoEnParqueo <= 95) return 13.00;
-            else return 16.00;
+            else if (tiempoEnParqueo <= 125) return 16.00;
+            else if (tiempoEnParqueo <= 155) return 21.00;
+            else if (tiempoEnParqueo <= 185) return 24.00;
+            else if (tiempoEnParqueo <= 215) return 29.00;
+            else if (tiempoEnParqueo <= 245) return 32.00;
+            else if (tiempoEnParqueo <= 275) return 37.00;
+            else if (tiempoEnParqueo <= 305) return 40.00;
+            else if (tiempoEnParqueo <= 335) return 45.00;
+            else if (tiempoEnParqueo <= 365) return 48.00;
+            else if (tiempoEnParqueo <= 395) return 53.00;
+            else if (tiempoEnParqueo <= 425) return 56.00;
+            else if (tiempoEnParqueo <= 455) return 61.00;
+            else if (tiempoEnParqueo <= 485) return 64.00;
+            else if (tiempoEnParqueo <= 515) return 69.00;
+            else if (tiempoEnParqueo <= 545) return 72.00;
+            else if (tiempoEnParqueo <= 575) return 77.00;
+            else if (tiempoEnParqueo <= 605) return 80.00;
+            else if (tiempoEnParqueo <= 635) return 85.00;
+            else return 88.00;
         }
 
-        // Función para actualizar la tabla
+        // Función para actualizar la tabla con los vehículos
         function actualizarTabla() {
-            const tablaClientes = document.getElementById('tablaClientes');
-            tablaClientes.innerHTML = `
+            const tabla = document.getElementById('tablaClientes');
+            tabla.innerHTML = `
                 <tr>
                     <th>Placa</th>
                     <th>Marca</th>
@@ -227,35 +245,27 @@
                     <th>Acciones</th>
                 </tr>
             `;
-            clientes.forEach(cliente => {
-                const tiempoTranscurrido = new Date() - cliente.horaIngreso;
-                const tiempoEnSegundos = Math.floor(tiempoTranscurrido / 1000);
-                const tiempoEnMinutos = Math.floor(tiempoEnSegundos / 60);
-                const horasRestantes = Math.floor(tiempoEnMinutos / 60);
-                const minutosRestantes = tiempoEnMinutos % 60;
-                const tiempoFormateado = `${String(horasRestantes).padStart(2, '0')}:${String(minutosRestantes).padStart(2, '0')}:${String(tiempoEnSegundos % 60).padStart(2, '0')}`;
 
+            clientes.forEach(cliente => {
+                const tiempoEnParqueo = Math.floor((new Date() - cliente.horaIngreso) / 1000 / 60);
+                const tarifa = calcularTarifa(cliente.horaIngreso);
                 const fila = document.createElement('tr');
                 fila.innerHTML = `
                     <td>${cliente.placa}</td>
                     <td>${cliente.marca}</td>
-                    <td><span id="tiempo-${cliente.placa}">${tiempoFormateado}</span></td>
-                    <td>${calcularTarifa(cliente.horaIngreso).toFixed(2)} Q</td>
+                    <td id="tiempo-${cliente.placa}">${formatearTiempo(tiempoEnParqueo)}</td>
+                    <td>${tarifa.toFixed(2)}</td>
                     <td><button onclick="retirarVehiculo('${cliente.placa}')">Retirar</button></td>
                 `;
-                tablaClientes.appendChild(fila);
-
-                setInterval(() => {
-                    const tiempoTranscurrido = new Date() - cliente.horaIngreso;
-                    const tiempoEnSegundos = Math.floor(tiempoTranscurrido / 1000);
-                    const tiempoEnMinutos = Math.floor(tiempoEnSegundos / 60);
-                    const horasRestantes = Math.floor(tiempoEnMinutos / 60);
-                    const minutosRestantes = tiempoEnMinutos % 60;
-
-                    const tiempoFormateado = `${String(horasRestantes).padStart(2, '0')}:${String(minutosRestantes).padStart(2, '0')}:${String(tiempoEnSegundos % 60).padStart(2, '0')}`;
-                    document.getElementById(`tiempo-${cliente.placa}`).textContent = tiempoFormateado;
-                }, 1000);
+                tabla.appendChild(fila);
             });
+        }
+
+        // Función para formatear el tiempo en minutos y segundos
+        function formatearTiempo(minutos) {
+            const horas = Math.floor(minutos / 60);
+            const minutosRestantes = minutos % 60;
+            return `${String(horas).padStart(2, '0')}:${String(minutosRestantes).padStart(2, '0')}`;
         }
 
         // Función para mostrar el ticket de parqueo
