@@ -225,7 +225,7 @@
                 if (fila) {
                     fila.querySelector(".tiempo").textContent = `${tiempoTranscurrido} min`;
                 }
-            }, 60000); // Actualizar cada minuto
+            }, 1000); // Actualizar cada segundo (1 segundo)
             return cronometroId;
         }
 
@@ -265,44 +265,14 @@
             }
 
             let total = 0;
-            let ticketContent = `
-                <h1>Ticket de Cierre del Día</h1>
-                <table border="1" style="width: 100%; text-align: center;">
-                    <tr>
-                        <th>Fecha de Salida</th>
-                        <th>Placa</th>
-                        <th>Tarifa Cobrada</th>
-                    </tr>
-            `;
-
             vehiculosRetirados.forEach(vehiculo => {
                 total += vehiculo.tarifaCobrada;
-                ticketContent += `
-                    <tr>
-                        <td>${vehiculo.fechaSalida}</td>
-                        <td>${vehiculo.placa}</td>
-                        <td>${vehiculo.tarifaCobrada.toFixed(2)}</td>
-                    </tr>
-                `;
             });
 
-            ticketContent += `
-                    <tr>
-                        <td colspan="2">Total</td>
-                        <td>${total.toFixed(2)}</td>
-                    </tr>
-                </table>
-                <footer>
-                    <p>&copy; 2024 MarckBusiness</p>
-                </footer>
-            `;
-
-            const nuevaVentana = window.open('', '', 'width=600,height=400');
-            nuevaVentana.document.write(ticketContent);
-            nuevaVentana.document.close();
+            alert(`Cierre del Día\nTotal Cobrado: Q${total.toFixed(2)}`);
         }
 
-        // Actualiza las tablas
+        // Funciones para actualizar las tablas de la interfaz
         function actualizarTabla() {
             const tablaClientes = document.getElementById('tablaClientes');
             tablaClientes.innerHTML = `
@@ -323,17 +293,16 @@
                     <td>${cliente.placa}</td>
                     <td>${cliente.marca}</td>
                     <td class="tiempo">${tiempoTranscurrido} min</td>
-                    <td>${(tiempoTranscurrido * tarifaPorMinuto).toFixed(2)} Q</td>
+                    <td>${calcularTarifa(cliente.horaIngreso).toFixed(2)} Q</td>
                     <td><button onclick="retirarVehiculo('${cliente.placa}')">Retirar</button></td>
                 `;
                 tablaClientes.appendChild(fila);
             });
         }
 
-        // Actualiza la tabla de vehículos retirados
         function actualizarTablaRetirados() {
-            const tablaVehiculosRetirados = document.getElementById('tablaVehiculosRetirados');
-            tablaVehiculosRetirados.innerHTML = `
+            const tablaRetirados = document.getElementById('tablaVehiculosRetirados');
+            tablaRetirados.innerHTML = `
                 <tr>
                     <th>Placa</th>
                     <th>Marca</th>
@@ -350,17 +319,22 @@
                     <td>${vehiculo.marca}</td>
                     <td>${vehiculo.tarifaCobrada.toFixed(2)} Q</td>
                     <td>${vehiculo.fechaSalida}</td>
-                    <td></td>
+                    <td><button onclick="eliminarVehiculoRetirado('${vehiculo.placa}')">Eliminar</button></td>
                 `;
-                tablaVehiculosRetirados.appendChild(fila);
+                tablaRetirados.appendChild(fila);
             });
         }
 
-        // Inicialización de las tablas al cargar la página
-        window.onload = function() {
-            actualizarTabla();
+        // Función para eliminar un vehículo retirado
+        function eliminarVehiculoRetirado(placa) {
+            vehiculosRetirados = vehiculosRetirados.filter(v => v.placa !== placa);
+            localStorage.setItem('vehiculosRetirados', JSON.stringify(vehiculosRetirados));
             actualizarTablaRetirados();
-        };
+        }
+
+        // Inicializar tablas
+        actualizarTabla();
+        actualizarTablaRetirados();
     </script>
 </body>
 </html>
