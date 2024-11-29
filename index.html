@@ -20,9 +20,10 @@
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
         }
 
-        header h1 {
-            font-size: 28px;
-            margin: 10px 0;
+        header img {
+            width: 100%;
+            max-height: 200px; /* Ajusta el tamaño máximo de la imagen */
+            object-fit: cover;
         }
 
         button {
@@ -101,7 +102,7 @@
 </head>
 <body>
     <header>
-        <h1>Registro de Vehículos en el Parqueo</h1>
+        <img src="https://raw.githubusercontent.com/usuario/repositorio/main/images/Dise%C3%B1o%20sin%20titulo.png" alt="Encabezado del Parqueo">
     </header>
 
     <!-- Formulario para ingresar vehículos -->
@@ -237,23 +238,17 @@
 
         // Función para hacer el cierre del día
         function hacerCierre() {
-            const clave = prompt("Ingrese la clave para realizar el cierre del día:");
-            if (clave !== "Multimedia") {
-                alert("Clave incorrecta.");
-                return;
-            }
-
-            let total = 0;
-            clientes.forEach(vehiculo => {
-                total += calcularTarifa(vehiculo.horaIngreso);
+            let totalRecaudado = 0;
+            clientes.forEach(cliente => {
+                totalRecaudado += calcularTarifa(cliente.horaIngreso);
             });
-            alert(`Cierre del Día\nTotal Cobrado: Q${total.toFixed(2)}`);
+            alert(`Total recaudado hoy: Q${totalRecaudado.toFixed(2)}`);
         }
 
-        // Evento para el botón "Ingresar Vehículo"
+        // Evento para el botón de ingresar vehículo
         document.getElementById('btnIngresar').addEventListener('click', ingresarVehiculo);
 
-        // Evento para permitir que se registre con la tecla Enter
+        // Evento para registrar con Enter
         document.getElementById('placa').addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 ingresarVehiculo();
