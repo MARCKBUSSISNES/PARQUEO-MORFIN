@@ -318,6 +318,13 @@
             });
         }
 
+        // Función para eliminar un vehículo retirado
+        function eliminarVehiculoRetirado(placa) {
+            vehiculosRetirados = vehiculosRetirados.filter(v => v.placa !== placa);
+            localStorage.setItem('vehiculosRetirados', JSON.stringify(vehiculosRetirados));
+            actualizarTablaRetirados();
+        }
+
         // Inicializar tablas
         actualizarTabla();
         actualizarTablaRetirados();
@@ -340,4 +347,5 @@
     </script>
 </body>
 </html>
+
 
