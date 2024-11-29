@@ -3,67 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Clientes de Parqueo | MarckBusiness</title>
+    <title>Registro de Vehículos en el Parqueo</title>
     <style>
-        /* Estilos generales */
         body {
-            background: linear-gradient(to right, #0a1d3d, #1f4e79); /* Azul tecnológico */
-            color: #fff;
-            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to right, #0a1d3d, #1f4e79);
+            color: white;
+            font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
         }
 
         header {
-            background-color: #FF6F00; /* Naranja vibrante */
+            background-color: #FF6F00;
             padding: 20px;
             text-align: center;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
         }
 
-        header img {
-            width: 120px; /* Ajusta el tamaño del logo para móviles */
-            margin-bottom: 15px;
-        }
-
         header h1 {
-            font-family: 'Candara', sans-serif;
             font-size: 28px;
-            color: #fff;
             margin: 10px 0;
         }
 
-        header p {
-            font-size: 14px;
-            font-weight: bold;
-            color: #FFF;
-        }
-
         button {
-            background-color: #FF6F00; /* Naranja */
+            background-color: #FF6F00;
             color: white;
             border: none;
             padding: 10px 20px;
             cursor: pointer;
             border-radius: 5px;
-            font-size: 14px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            width: 100%; /* Ajusta el botón para que ocupe todo el ancho */
-            margin-top: 10px;
+            font-size: 16px;
+            width: 100%;
         }
 
         button:hover {
             background-color: #E65100;
         }
 
+        .formulario {
+            text-align: center;
+            margin: 30px auto;
+            max-width: 500px;
+        }
+
         table {
             width: 100%;
             margin-top: 20px;
             border-collapse: collapse;
-            background-color: #1f4e79; /* Azul oscuro */
-            color: white;
-            border-radius: 10px;
-            overflow: hidden;
+            background-color: #1f4e79;
         }
 
         th, td {
@@ -72,7 +59,7 @@
         }
 
         th {
-            background-color: #FF6F00; /* Naranja */
+            background-color: #FF6F00;
         }
 
         td {
@@ -86,13 +73,7 @@
             border: 1px solid #FF6F00;
             font-size: 16px;
             color: #333;
-            width: 100%; /* Ajusta los inputs para que ocupen todo el ancho */
-        }
-
-        .formulario {
-            margin: 30px auto;
-            text-align: center;
-            max-width: 500px;
+            width: 100%;
         }
 
         .cierre {
@@ -106,98 +87,55 @@
             color: white;
             padding: 10px 0;
             text-align: center;
-            font-family: 'Candara', sans-serif;
+            font-size: 12px;
             position: fixed;
             bottom: 0;
             width: 100%;
         }
 
         footer p {
-            font-size: 12px;
+            margin: 0;
         }
 
-        @media (max-width: 768px) {
-            /* Ajustes para pantallas más pequeñas */
-            header h1 {
-                font-size: 24px;
-            }
-
-            header img {
-                width: 100px; /* Ajuste logo */
-            }
-
-            button {
-                font-size: 16px;
-            }
-
-            .formulario input, button {
-                width: 100%; /* Hacer botones e inputs responsivos */
-            }
-
-            table {
-                font-size: 14px; /* Reducir tamaño de texto de la tabla */
-            }
-
-            th, td {
-                padding: 10px;
-            }
-
-            footer p {
-                font-size: 10px;
-            }
-        }
     </style>
 </head>
 <body>
     <header>
-        <img src="images/diseno_sin_titulo.png" alt="Logo MarckBusiness">
-        <h1>MarckBusiness</h1>
-        <p>Soluciones Sin Límites</p>
+        <h1>Registro de Vehículos en el Parqueo</h1>
     </header>
 
     <!-- Formulario para ingresar vehículos -->
     <div class="formulario">
-        <h2>Ingresar Vehículo</h2>
-        <input type="text" id="placa" placeholder="Placa">
-        <input type="text" id="marca" placeholder="Marca">
-        <button id="btnIngresar">Ingresar</button>
+        <input type="text" id="placa" placeholder="Placa del vehículo">
+        <input type="text" id="marca" placeholder="Marca del vehículo">
+        <button id="btnIngresar">Ingresar Vehículo</button>
     </div>
 
-    <!-- Tablas -->
-    <div class="tabla-section">
-        <h2>Vehículos en el Parqueo</h2>
-        <table id="tablaClientes">
-            <tr>
-                <th>Placa</th>
-                <th>Marca</th>
-                <th>Tiempo en Parqueo</th>
-                <th>Tarifa</th>
-                <th>Acciones</th>
-            </tr>
-        </table>
+    <!-- Tabla para mostrar los vehículos registrados -->
+    <table id="tablaClientes">
+        <tr>
+            <th>Placa</th>
+            <th>Marca</th>
+            <th>Tiempo en Parqueo</th>
+            <th>Tarifa</th>
+            <th>Acciones</th>
+        </tr>
+    </table>
 
-        <h2>Vehículos Retirados</h2>
-        <table id="tablaVehiculosRetirados">
-            <tr>
-                <th>Placa</th>
-                <th>Marca</th>
-                <th>Tarifa Cobrada</th>
-                <th>Fecha de Salida</th>
-                <th>Acciones</th>
-            </tr>
-        </table>
-    </div>
-
-    <!-- Botón para cierre del día -->
     <div class="cierre">
         <button onclick="hacerCierre()">Cierre del Día</button>
     </div>
 
-    <script>
-        let clientes = JSON.parse(localStorage.getItem('vehiculos')) || [];
-        let vehiculosRetirados = JSON.parse(localStorage.getItem('vehiculosRetirados')) || [];
+    <footer>
+        <p>MarckBusiness | Todos los derechos reservados</p>
+    </footer>
 
-        const tarifaPorMinuto = 0.5; // Tarifa por minuto en Quetzales
+    <script>
+        // Definimos los vehículos y los vehiculos retirados en el localStorage
+        let clientes = JSON.parse(localStorage.getItem('vehiculos')) || [];
+
+        // Tarifa por minuto en Quetzales
+        const tarifaPorMinuto = 0.5;
 
         // Función para ingresar un vehículo
         function ingresarVehiculo() {
@@ -209,40 +147,17 @@
                 return;
             }
 
+            // Registrar el vehículo con la hora de ingreso
             const horaIngreso = new Date();
-            clientes.push({ placa, marca, horaIngreso, cronometroId: startCronometro(horaIngreso) });
+            clientes.push({ placa, marca, horaIngreso });
             localStorage.setItem('vehiculos', JSON.stringify(clientes));
+
+            // Limpiar los campos del formulario
+            document.getElementById('placa').value = '';
+            document.getElementById('marca').value = '';
+
+            // Actualizar la tabla
             actualizarTabla();
-            document.getElementById('placa').value = ''; // Limpiar el campo de placa
-            document.getElementById('marca').value = ''; // Limpiar el campo de marca
-        }
-
-        // Función para iniciar el cronómetro
-        function startCronometro(horaIngreso) {
-            const cronometroId = setInterval(() => {
-                const tiempoTranscurrido = Math.floor((new Date() - horaIngreso) / 1000 / 60); // En minutos
-                const fila = document.querySelector(`#cliente-${horaIngreso.getTime()}`);
-                if (fila) {
-                    fila.querySelector(".tiempo").textContent = `${tiempoTranscurrido} min`;
-                }
-            }, 1000); // Actualizar cada segundo (1 segundo)
-            return cronometroId;
-        }
-
-        // Función para retirar un vehículo
-        function retirarVehiculo(placa) {
-            const vehiculo = clientes.find(v => v.placa === placa);
-            const tarifa = calcularTarifa(vehiculo.horaIngreso);
-            const fechaSalida = new Date().toLocaleString();
-
-            vehiculosRetirados.push({ ...vehiculo, tarifaCobrada: tarifa, fechaSalida });
-            clientes = clientes.filter(v => v.placa !== placa);
-
-            localStorage.setItem('vehiculos', JSON.stringify(clientes));
-            localStorage.setItem('vehiculosRetirados', JSON.stringify(vehiculosRetirados));
-
-            actualizarTabla();
-            actualizarTablaRetirados();
         }
 
         // Función para calcular la tarifa
@@ -251,22 +166,7 @@
             return tiempoEnParqueo * tarifaPorMinuto;
         }
 
-        // Función para hacer el cierre del día
-        function hacerCierre() {
-            const clave = prompt("Ingrese la clave para realizar el cierre del día:");
-            if (clave !== "Multimedia") {
-                alert("Clave incorrecta.");
-                return;
-            }
-
-            let total = 0;
-            vehiculosRetirados.forEach(vehiculo => {
-                total += vehiculo.tarifaCobrada;
-            });
-            alert(`Cierre del Día\nTotal Cobrado: Q${total.toFixed(2)}`);
-        }
-
-        // Función para actualizar la tabla de clientes
+        // Función para actualizar la tabla de vehículos
         function actualizarTabla() {
             const tablaClientes = document.getElementById('tablaClientes');
             tablaClientes.innerHTML = `
@@ -281,11 +181,10 @@
             clientes.forEach(cliente => {
                 const tiempoTranscurrido = Math.floor((new Date() - cliente.horaIngreso) / 1000 / 60);
                 const fila = document.createElement('tr');
-                fila.id = `cliente-${cliente.horaIngreso.getTime()}`;
                 fila.innerHTML = `
                     <td>${cliente.placa}</td>
                     <td>${cliente.marca}</td>
-                    <td class="tiempo">${tiempoTranscurrido} min</td>
+                    <td>${tiempoTranscurrido} min</td>
                     <td>${calcularTarifa(cliente.horaIngreso).toFixed(2)} Q</td>
                     <td><button onclick="retirarVehiculo('${cliente.placa}')">Retirar</button></td>
                 `;
@@ -293,46 +192,42 @@
             });
         }
 
-        // Función para actualizar la tabla de vehículos retirados
-        function actualizarTablaRetirados() {
-            const tablaRetirados = document.getElementById('tablaVehiculosRetirados');
-            tablaRetirados.innerHTML = `
-                <tr>
-                    <th>Placa</th>
-                    <th>Marca</th>
-                    <th>Tarifa Cobrada</th>
-                    <th>Fecha de Salida</th>
-                    <th>Acciones</th>
-                </tr>
-            `;
-            vehiculosRetirados.forEach(vehiculo => {
-                const fila = document.createElement('tr');
-                fila.innerHTML = `
-                    <td>${vehiculo.placa}</td>
-                    <td>${vehiculo.marca}</td>
-                    <td>${vehiculo.tarifaCobrada.toFixed(2)} Q</td>
-                    <td>${vehiculo.fechaSalida}</td>
-                    <td><button onclick="eliminarVehiculoRetirado('${vehiculo.placa}')">Eliminar</button></td>
-                `;
-                tablaRetirados.appendChild(fila);
+        // Función para retirar un vehículo
+        function retirarVehiculo(placa) {
+            // Encontrar el vehículo por placa
+            const vehiculo = clientes.find(v => v.placa === placa);
+            const tarifa = calcularTarifa(vehiculo.horaIngreso);
+
+            // Eliminar el vehículo de la lista
+            clientes = clientes.filter(v => v.placa !== placa);
+
+            localStorage.setItem('vehiculos', JSON.stringify(clientes));
+
+            // Actualizar la tabla
+            actualizarTabla();
+
+            alert(`El vehículo con placa ${placa} ha sido retirado. Tarifa cobrada: Q${tarifa.toFixed(2)}`);
+        }
+
+        // Función para hacer el cierre del día
+        function hacerCierre() {
+            const clave = prompt("Ingrese la clave para realizar el cierre del día:");
+            if (clave !== "Multimedia") {
+                alert("Clave incorrecta.");
+                return;
+            }
+
+            let total = 0;
+            clientes.forEach(vehiculo => {
+                total += calcularTarifa(vehiculo.horaIngreso);
             });
+            alert(`Cierre del Día\nTotal Cobrado: Q${total.toFixed(2)}`);
         }
 
-        // Función para eliminar un vehículo retirado
-        function eliminarVehiculoRetirado(placa) {
-            vehiculosRetirados = vehiculosRetirados.filter(v => v.placa !== placa);
-            localStorage.setItem('vehiculosRetirados', JSON.stringify(vehiculosRetirados));
-            actualizarTablaRetirados();
-        }
-
-        // Inicializar tablas
-        actualizarTabla();
-        actualizarTablaRetirados();
-
-        // Evento del botón de ingresar vehículo
+        // Evento para el botón "Ingresar Vehículo"
         document.getElementById('btnIngresar').addEventListener('click', ingresarVehiculo);
 
-        // Hacer que el botón funcione también al presionar Enter
+        // Evento para permitir que se registre con la tecla Enter
         document.getElementById('placa').addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 ingresarVehiculo();
@@ -344,8 +239,9 @@
                 ingresarVehiculo();
             }
         });
+
+        // Inicializar la tabla
+        actualizarTabla();
     </script>
 </body>
 </html>
-
-
