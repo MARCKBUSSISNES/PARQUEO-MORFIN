@@ -187,6 +187,7 @@
     </footer>
 
     <script>
+        // Se cargan los vehículos almacenados en localStorage
         let clientes = JSON.parse(localStorage.getItem('vehiculos')) || [];
 
         function ingresarVehiculo() {
@@ -198,15 +199,19 @@
                 return;
             }
 
+            // Crear el objeto del vehículo
             const horaIngreso = new Date();
             clientes.push({ placa, marca, horaIngreso });
+            
+            // Guardar en localStorage
             localStorage.setItem('vehiculos', JSON.stringify(clientes));
 
+            // Limpiar los campos
             document.getElementById('placa').value = '';
             document.getElementById('marca').value = '';
 
+            // Mostrar el ticket
             mostrarTicket(placa, marca, horaIngreso);
-            actualizarTabla();
         }
 
         // Tarifas literales basadas en el tiempo exacto de parqueo con segundos.
@@ -238,6 +243,7 @@
             else return 88.00; // 10:35:01 - 11:05:00 Q88
         }
 
+        // Mostrar el ticket de ingreso
         function mostrarTicket(placa, marca, horaIngreso) {
             const ticketContainer = document.getElementById('ticketContainer');
             const ticket = document.createElement('div');
@@ -253,6 +259,7 @@
             ticketContainer.appendChild(ticket);
         }
 
+        // Función para hacer el cierre del día
         function hacerCierre() {
             let totalRecaudado = 0;
             const detalles = clientes.map(cliente => {
@@ -277,6 +284,10 @@
         // Actualizar la tabla cada segundo
         setInterval(actualizarTabla, 1000);
 
+        // Botón de ingreso
+        document.getElementById('btnIngresar').addEventListener('click', ingresarVehiculo);
+
     </script>
 </body>
 </html>
+
