@@ -148,9 +148,6 @@
         // Definimos los vehículos y los vehiculos retirados en el localStorage
         let clientes = JSON.parse(localStorage.getItem('vehiculos')) || [];
 
-        // Tarifa por minuto en Quetzales
-        const tarifaPorMinuto = 0.5;
-
         // Función para ingresar un vehículo
         function ingresarVehiculo() {
             const placa = document.getElementById('placa').value.trim();
@@ -174,10 +171,60 @@
             actualizarTabla();
         }
 
-        // Función para calcular la tarifa
+        // Función para calcular la tarifa según los rangos de tiempo
         function calcularTarifa(horaIngreso) {
             const tiempoEnParqueo = Math.floor((new Date() - horaIngreso) / 1000 / 60); // En minutos
-            return tiempoEnParqueo * tarifaPorMinuto;
+
+            // Rango de tarifas
+            if (tiempoEnParqueo <= 5) {
+                return 0; // Gratis
+            } else if (tiempoEnParqueo <= 35) {
+                return 5.00; // Q5.00
+            } else if (tiempoEnParqueo <= 65) {
+                return 8.00; // Q8.00
+            } else if (tiempoEnParqueo <= 95) {
+                return 13.00; // Q13.00
+            } else if (tiempoEnParqueo <= 125) {
+                return 16.00; // Q16.00
+            } else if (tiempoEnParqueo <= 155) {
+                return 21.00; // Q21.00
+            } else if (tiempoEnParqueo <= 185) {
+                return 24.00; // Q24.00
+            } else if (tiempoEnParqueo <= 215) {
+                return 29.00; // Q29.00
+            } else if (tiempoEnParqueo <= 245) {
+                return 32.00; // Q32.00
+            } else if (tiempoEnParqueo <= 275) {
+                return 37.00; // Q37.00
+            } else if (tiempoEnParqueo <= 305) {
+                return 40.00; // Q40.00
+            } else if (tiempoEnParqueo <= 335) {
+                return 45.00; // Q45.00
+            } else if (tiempoEnParqueo <= 365) {
+                return 48.00; // Q48.00
+            } else if (tiempoEnParqueo <= 395) {
+                return 53.00; // Q53.00
+            } else if (tiempoEnParqueo <= 425) {
+                return 56.00; // Q56.00
+            } else if (tiempoEnParqueo <= 455) {
+                return 61.00; // Q61.00
+            } else if (tiempoEnParqueo <= 485) {
+                return 64.00; // Q64.00
+            } else if (tiempoEnParqueo <= 515) {
+                return 69.00; // Q69.00
+            } else if (tiempoEnParqueo <= 545) {
+                return 72.00; // Q72.00
+            } else if (tiempoEnParqueo <= 575) {
+                return 77.00; // Q77.00
+            } else if (tiempoEnParqueo <= 605) {
+                return 80.00; // Q80.00
+            } else if (tiempoEnParqueo <= 635) {
+                return 85.00; // Q85.00
+            } else if (tiempoEnParqueo <= 665) {
+                return 88.00; // Q88.00
+            }
+
+            return 88.00; // Default para tiempos mayores a 665 minutos
         }
 
         // Función para actualizar la tabla de vehículos
