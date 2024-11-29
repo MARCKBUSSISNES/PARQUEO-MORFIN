@@ -13,26 +13,27 @@
             padding: 0;
         }
 
-        /* Estilo para el encabezado con la imagen grande y fondo negro */
         header {
-            background-image: url('IMAGEN1.jpg');
-            background-size: cover;
-            background-position: center;
-            height: 350px; /* Ajustado a 350px */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-            font-size: 36px;
-            font-weight: bold;
-            background-color: #000; /* Fondo negro */
+            background-color: #FF6F00;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
         }
 
-        /* Estilo para el texto del encabezado */
-        header h1 {
-            margin: 0;
-            padding: 0;
+        header img {
+            width: 100%;
+            max-height: 200px; /* Ajusta el tamaño máximo de la imagen */
+            object-fit: cover;
+        }
+
+        /* Estilo para la imagen en la esquina superior izquierda */
+        .imagen-izquierda {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            width: 100px; /* Ajusta el tamaño de la imagen */
+            height: auto;
+            z-index: 10;
         }
 
         button {
@@ -106,13 +107,15 @@
         footer p {
             margin: 0;
         }
+
     </style>
 </head>
 <body>
+    <!-- Imagen en la esquina superior izquierda -->
+    <img src="IMAGEN1.jpg" alt="Imagen de Encabezado" class="imagen-izquierda">
 
-    <!-- Encabezado con la imagen grande y fondo negro -->
     <header>
-        <h1>Parqueo Vehicular</h1>
+        <img src="https://raw.githubusercontent.com/usuario/repositorio/main/images/Dise%C3%B1o%20sin%20titulo.png" alt="Encabezado del Parqueo">
     </header>
 
     <!-- Formulario para ingresar vehículos -->
@@ -195,38 +198,84 @@
                 const tiempoEnSegundos = Math.floor(tiempoTranscurrido / 1000);
                 const tiempoEnMinutos = Math.floor(tiempoEnSegundos / 60);
                 const tiempoEnHoras = Math.floor(tiempoEnMinutos / 60);
-                const minutosRestantes = tiempoEnMinutos % 60;
                 const segundosRestantes = tiempoEnSegundos % 60;
+                const minutosRestantes = tiempoEnMinutos % 60;
+                const horasRestantes = tiempoEnHoras;
+
+                // Formato de tiempo: HH:mm:ss
+                const tiempoFormateado = `${String(horasRestantes).padStart(2, '0')}:${String(minutosRestantes).padStart(2, '0')}:${String(segundosRestantes).padStart(2, '0')}`;
 
                 const fila = document.createElement('tr');
                 fila.innerHTML = `
                     <td>${cliente.placa}</td>
                     <td>${cliente.marca}</td>
-                    <td>${tiempoEnHoras}h ${minutosRestantes}m ${segundosRestantes}s</td>
+                    <td><span id="tiempo-${cliente.placa}">${tiempoFormateado}</span></td>
                     <td>${calcularTarifa(cliente.horaIngreso).toFixed(2)} Q</td>
                     <td><button onclick="retirarVehiculo('${cliente.placa}')">Retirar</button></td>
                 `;
                 tablaClientes.appendChild(fila);
+
+                // Actualizar el cronómetro cada segundo para este vehículo
+                setInterval(() => {
+                    const tiempoTranscurrido = new Date() - cliente.horaIngreso;
+                    const tiempoEnSegundos = Math.floor(tiempoTranscurrido / 1000);
+                    const tiempoEnMinutos = Math.floor(tiempoEnSegundos / 60);
+                    const tiempoEnHoras = Math.floor(tiempoEnMinutos / 60);
+                    const segundosRestantes = tiempoEnSegundos % 60;
+                    const minutosRestantes = tiempoEnMinutos % 60;
+
+                    const tiempoFormateado = `${String(tiempoEnHoras).padStart(2, '0')}:${String(minutosRestantes).padStart(2, '0')}:${String(segundosRestantes).padStart(2, '0')}`;
+
+                    // Actualizamos el cronómetro de la tabla
+                    document.getElementById(`tiempo-${cliente.placa}`).textContent = tiempoFormateado;
+                }, 1000);
             });
         }
 
         // Función para retirar un vehículo
         function retirarVehiculo(placa) {
+            // Encontrar el vehículo por placa
             const vehiculo = clientes.find(v => v.placa === placa);
             const tarifa = calcularTarifa(vehiculo.horaIngreso);
-            const fechaSalida = new Date().toLocaleString();
 
-            // Eliminar el vehículo de la lista de clientes y agregarlo a los retirados
+            // Eliminar el vehículo de la lista
             clientes = clientes.filter(v => v.placa !== placa);
+
             localStorage.setItem('vehiculos', JSON.stringify(clientes));
 
             // Actualizar la tabla
             actualizarTabla();
+
+            alert(`El vehículo con placa ${placa} ha sido retirado. Total a pagar: Q${tarifa.toFixed(2)}`);
         }
 
-        // Inicializar la tabla cuando se carga la página
-        window.onload = actualizarTabla;
+        // Función para hacer el cierre del día
+        function hacerCierre() {
+            let totalRecaudado = 0;
+            clientes.forEach(cliente => {
+                totalRecaudado += calcularTarifa(cliente.horaIngreso);
+            });
+            alert(`Total recaudado hoy: Q${totalRecaudado.toFixed(2)}`);
+        }
 
+        // Evento para el botón de ingresar vehículo
+        document.getElementById('btnIngresar').addEventListener('click', ingresarVehiculo);
+
+        // Evento para registrar con Enter
+        document.getElementById('placa').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                ingresarVehiculo();
+            }
+        });
+
+        document.getElementById('marca').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                ingresarVehiculo();
+            }
+        });
+
+        // Inicializar la tabla
+        actualizarTabla();
     </script>
 </body>
 </html>
