@@ -6,7 +6,7 @@
     <title>Registro de Vehículos en el Parqueo</title>
     <style>
         body {
-            background: linear-gradient(to right, #0a1d3d, #1f4e79);
+            background-color: #1c1c1c;
             color: white;
             font-family: Arial, sans-serif;
             margin: 0;
@@ -14,24 +14,25 @@
         }
 
         .encabezado {
-            background-color: #FF6F00;
+            background-color: #e60000;
             color: white;
             text-align: center;
             padding: 20px;
             font-size: 36px;
+            font-weight: bold;
         }
 
         .imagen-izquierda {
             position: fixed;
             top: 10px;
             left: 10px;
-            width: 150px;
+            width: 120px;
             height: auto;
             z-index: 10;
         }
 
         button {
-            background-color: #FF6F00;
+            background-color: #e60000;
             color: white;
             border: none;
             padding: 10px 20px;
@@ -42,7 +43,7 @@
         }
 
         button:hover {
-            background-color: #E65100;
+            background-color: #b30000;
         }
 
         .formulario {
@@ -55,7 +56,7 @@
             width: 100%;
             margin-top: 20px;
             border-collapse: collapse;
-            background-color: #1f4e79;
+            background-color: #333;
         }
 
         th, td {
@@ -64,18 +65,18 @@
         }
 
         th {
-            background-color: #FF6F00;
+            background-color: #e60000;
         }
 
         td {
-            background-color: #263a53;
+            background-color: #222;
         }
 
         input {
             padding: 12px;
             margin: 5px;
             border-radius: 5px;
-            border: 1px solid #FF6F00;
+            border: 1px solid #e60000;
             font-size: 16px;
             color: #333;
             width: 100%;
@@ -88,7 +89,7 @@
         }
 
         footer {
-            background-color: #263a53;
+            background-color: #333;
             color: white;
             padding: 10px 0;
             text-align: center;
@@ -102,12 +103,11 @@
             margin: 0;
         }
 
-        /* Estilo para el ticket */
         .ticket {
-            width: 80mm; /* Ancho adecuado para impresora de 80mm */
+            width: 80mm; 
             margin: 0;
             padding: 10px;
-            border: 1px dashed #FF6F00;
+            border: 1px dashed #e60000;
             text-align: center;
             font-size: 18px;
             background-color: white;
@@ -128,34 +128,29 @@
             font-size: 16px;
         }
 
-        /* Estilo para tabla de parqueo */
         .tabla-vehiculos {
             margin: 20px auto;
             width: 80%;
-            border: 1px solid #FF6F00;
+            border: 1px solid #e60000;
             border-radius: 10px;
             padding: 10px;
-            background-color: #263a53;
+            background-color: #222;
         }
     </style>
 </head>
 <body>
-    <!-- Encabezado con nombre "Multicars" -->
     <div class="encabezado">
         Multicars
     </div>
 
-    <!-- Imagen en la esquina superior izquierda -->
-    <img src="IMAGEN1.jpg" alt="Imagen de Encabezado" class="imagen-izquierda">
+    <img src="IMAGEN1.jpg" alt="Logo" class="imagen-izquierda">
 
-    <!-- Formulario para ingresar vehículos -->
     <div class="formulario">
         <input type="text" id="placa" placeholder="Placa del vehículo">
         <input type="text" id="marca" placeholder="Marca del vehículo">
         <button id="btnIngresar">Ingresar Vehículo</button>
     </div>
 
-    <!-- Tabla para mostrar los vehículos registrados -->
     <div class="tabla-vehiculos">
         <table id="tablaClientes">
             <tr>
@@ -179,7 +174,6 @@
     <script>
         let clientes = JSON.parse(localStorage.getItem('vehiculos')) || [];
 
-        // Función para ingresar un vehículo
         function ingresarVehiculo() {
             const placa = document.getElementById('placa').value.trim();
             const marca = document.getElementById('marca').value.trim();
@@ -193,22 +187,16 @@
             clientes.push({ placa, marca, horaIngreso });
             localStorage.setItem('vehiculos', JSON.stringify(clientes));
 
-            // Limpiar los campos del formulario
             document.getElementById('placa').value = '';
             document.getElementById('marca').value = '';
 
-            // Mostrar el ticket de parqueo
             mostrarTicket(placa, marca, horaIngreso);
-
-            // Actualizar la tabla
             actualizarTabla();
         }
 
-        // Función para calcular la tarifa según los rangos de tiempo
         function calcularTarifa(horaIngreso) {
             const tiempoEnParqueo = Math.floor((new Date() - horaIngreso) / 1000 / 60);
-
-            if (tiempoEnParqueo <= 5) return 0; // Gratis
+            if (tiempoEnParqueo <= 5) return 0;
             else if (tiempoEnParqueo <= 35) return 5.00;
             else if (tiempoEnParqueo <= 65) return 8.00;
             else if (tiempoEnParqueo <= 95) return 13.00;
@@ -233,7 +221,13 @@
             else return 88.00;
         }
 
-        // Función para actualizar la tabla con los vehículos
+        function formatearTiempo(ms) {
+            const horas = Math.floor(ms / 3600);
+            const minutos = Math.floor((ms % 3600) / 60);
+            const segundos = ms % 60;
+            return `${String(horas).padStart(2, '0')}:${String(minutos).padStart(2, '0')}:${String(segundos).padStart(2, '0')}`;
+        }
+
         function actualizarTabla() {
             const tabla = document.getElementById('tablaClientes');
             tabla.innerHTML = `
@@ -247,13 +241,13 @@
             `;
 
             clientes.forEach(cliente => {
-                const tiempoEnParqueo = Math.floor((new Date() - cliente.horaIngreso) / 1000 / 60);
+                const tiempoEnParqueo = Math.floor((new Date() - cliente.horaIngreso) / 1000);
                 const tarifa = calcularTarifa(cliente.horaIngreso);
                 const fila = document.createElement('tr');
                 fila.innerHTML = `
                     <td>${cliente.placa}</td>
                     <td>${cliente.marca}</td>
-                    <td id="tiempo-${cliente.placa}">${formatearTiempo(tiempoEnParqueo)}</td>
+                    <td>${formatearTiempo(tiempoEnParqueo)}</td>
                     <td>${tarifa.toFixed(2)}</td>
                     <td><button onclick="retirarVehiculo('${cliente.placa}')">Retirar</button></td>
                 `;
@@ -261,14 +255,6 @@
             });
         }
 
-        // Función para formatear el tiempo en minutos y segundos
-        function formatearTiempo(minutos) {
-            const horas = Math.floor(minutos / 60);
-            const minutosRestantes = minutos % 60;
-            return `${String(horas).padStart(2, '0')}:${String(minutosRestantes).padStart(2, '0')}`;
-        }
-
-        // Función para mostrar el ticket de parqueo
         function mostrarTicket(placa, marca, horaIngreso) {
             const ticket = document.createElement('div');
             ticket.classList.add('ticket');
@@ -284,7 +270,6 @@
             document.body.appendChild(ticket);
         }
 
-        // Función para imprimir el ticket
         function imprimirTicket(ticketButton) {
             const ticket = ticketButton.parentElement;
             const ventanaImpresion = window.open('', '', 'width=300,height=400');
@@ -295,46 +280,42 @@
             ventanaImpresion.print();
         }
 
-        // Función para retirar un vehículo
         function retirarVehiculo(placa) {
             const vehiculo = clientes.find(v => v.placa === placa);
             const tarifa = calcularTarifa(vehiculo.horaIngreso);
-
             clientes = clientes.filter(v => v.placa !== placa);
             localStorage.setItem('vehiculos', JSON.stringify(clientes));
             actualizarTabla();
-
             alert(`El vehículo con placa ${placa} ha sido retirado. Total a pagar: Q${tarifa.toFixed(2)}`);
         }
 
-        // Función para hacer el cierre del día
         function hacerCierre() {
             let totalRecaudado = 0;
-            clientes.forEach(cliente => {
-                totalRecaudado += calcularTarifa(cliente.horaIngreso);
-            });
-            alert(`Total recaudado hoy: Q${totalRecaudado.toFixed(2)}`);
+            const detalles = clientes.map(cliente => {
+                const tarifa = calcularTarifa(cliente.horaIngreso);
+                totalRecaudado += tarifa;
+                return `
+                    Placa: ${cliente.placa} | Marca: ${cliente.marca} | 
+                    Hora Ingreso: ${cliente.horaIngreso.toLocaleString()} | Tarifa: Q${tarifa.toFixed(2)}
+                `;
+            }).join('<br>');
+            
+            const cierreTicket = `
+                <div class="ticket">
+                    <h2>Cierre del Día</h2>
+                    <p>${detalles}</p>
+                    <p><strong>Total Recaudado:</strong> Q${totalRecaudado.toFixed(2)}</p>
+                    <button onclick="imprimirTicket(this)">Imprimir Cierre</button>
+                </div>
+            `;
+            document.body.innerHTML = cierreTicket;
         }
 
         document.getElementById('btnIngresar').addEventListener('click', ingresarVehiculo);
 
-        document.getElementById('placa').addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                ingresarVehiculo();
-            }
-        });
-
-        document.getElementById('marca').addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                ingresarVehiculo();
-            }
-        });
-
-        // Actualizar la tabla cada 60 segundos
-        setInterval(actualizarTabla, 60000);
-
-        // Inicializar la tabla con los datos de los vehículos almacenados
-        actualizarTabla();
+        // Actualizar la tabla cada segundo
+        setInterval(actualizarTabla, 1000);
     </script>
 </body>
 </html>
+
