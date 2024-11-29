@@ -114,6 +114,7 @@
             color: black;
             font-family: "Courier New", Courier, monospace;
             line-height: 1.5;
+            margin-bottom: 20px;
         }
 
         .ticket img {
@@ -164,7 +165,6 @@
     </footer>
 
     <script>
-        // Definimos los vehículos y los vehiculos retirados en el localStorage
         let clientes = JSON.parse(localStorage.getItem('vehiculos')) || [];
 
         // Función para ingresar un vehículo
@@ -177,7 +177,6 @@
                 return;
             }
 
-            // Registrar el vehículo con la hora de ingreso
             const horaIngreso = new Date();
             clientes.push({ placa, marca, horaIngreso });
             localStorage.setItem('vehiculos', JSON.stringify(clientes));
@@ -186,7 +185,7 @@
             document.getElementById('placa').value = '';
             document.getElementById('marca').value = '';
 
-            // Mostrar el ticket de parqueo y ejecutarlo
+            // Mostrar el ticket de parqueo
             mostrarTicket(placa, marca, horaIngreso);
 
             // Actualizar la tabla
@@ -195,66 +194,13 @@
 
         // Función para calcular la tarifa según los rangos de tiempo
         function calcularTarifa(horaIngreso) {
-            const tiempoEnParqueo = Math.floor((new Date() - horaIngreso) / 1000 / 60); // En minutos
+            const tiempoEnParqueo = Math.floor((new Date() - horaIngreso) / 1000 / 60);
 
-            // Rango de tarifas
-            if (tiempoEnParqueo <= 5) {
-                return 0; // Gratis
-            } else if (tiempoEnParqueo <= 35) {
-                return 5.00; // Q5.00
-            } else if (tiempoEnParqueo <= 65) {
-                return 8.00; // Q8.00
-            } else if (tiempoEnParqueo <= 95) {
-                return 13.00; // Q13.00
-            } else if (tiempoEnParqueo <= 125) {
-                return 16.00; // Q16.00
-            } else if (tiempoEnParqueo <= 155) {
-                return 21.00; // Q21.00
-            } else if (tiempoEnParqueo <= 185) {
-                return 24.00; // Q24.00
-            } else if (tiempoEnParqueo <= 215) {
-                return 29.00; // Q29.00
-            } else if (tiempoEnParqueo <= 245) {
-                return 32.00; // Q32.00
-            } else if (tiempoEnParqueo <= 275) {
-                return 37.00; // Q37.00
-            } else if (tiempoEnParqueo <= 305) {
-                return 40.00; // Q40.00
-            } else if (tiempoEnParqueo <= 335) {
-                return 45.00; // Q45.00
-            } else if (tiempoEnParqueo <= 365) {
-                return 48.00; // Q48.00
-            } else if (tiempoEnParqueo <= 395) {
-                return 53.00; // Q53.00
-            } else if (tiempoEnParqueo <= 425) {
-                return 56.00; // Q56.00
-            } else if (tiempoEnParqueo <= 455) {
-                return 61.00; // Q61.00
-            } else if (tiempoEnParqueo <= 485) {
-                return 64.00; // Q64.00
-            } else if (tiempoEnParqueo <= 515) {
-                return 69.00; // Q69.00
-            } else if (tiempoEnParqueo <= 545) {
-                return 72.00; // Q72.00
-            } else if (tiempoEnParqueo <= 575) {
-                return 77.00; // Q77.00
-            } else if (tiempoEnParqueo <= 605) {
-                return 80.00; // Q80.00
-            } else if (tiempoEnParqueo <= 635) {
-                return 85.00; // Q85.00
-            } else if (tiempoEnParqueo <= 665) {
-                return 90.00; // Q90.00
-            } else if (tiempoEnParqueo <= 695) {
-                return 93.00; // Q93.00
-            } else if (tiempoEnParqueo <= 725) {
-                return 96.00; // Q96.00
-            } else if (tiempoEnParqueo <= 755) {
-                return 101.00; // Q101.00
-            } else if (tiempoEnParqueo <= 785) {
-                return 104.00; // Q104.00
-            } else {
-                return 110.00; // Q110.00
-            }
+            if (tiempoEnParqueo <= 5) return 0; // Gratis
+            else if (tiempoEnParqueo <= 35) return 5.00;
+            else if (tiempoEnParqueo <= 65) return 8.00;
+            else if (tiempoEnParqueo <= 95) return 13.00;
+            else return 16.00;
         }
 
         // Función para actualizar la tabla
@@ -273,12 +219,9 @@
                 const tiempoTranscurrido = new Date() - cliente.horaIngreso;
                 const tiempoEnSegundos = Math.floor(tiempoTranscurrido / 1000);
                 const tiempoEnMinutos = Math.floor(tiempoEnSegundos / 60);
-                const tiempoEnHoras = Math.floor(tiempoEnMinutos / 60);
-                const segundosRestantes = tiempoEnSegundos % 60;
+                const horasRestantes = Math.floor(tiempoEnMinutos / 60);
                 const minutosRestantes = tiempoEnMinutos % 60;
-                const horasRestantes = tiempoEnHoras;
-
-                const tiempoFormateado = `${String(horasRestantes).padStart(2, '0')}:${String(minutosRestantes).padStart(2, '0')}:${String(segundosRestantes).padStart(2, '0')}`;
+                const tiempoFormateado = `${String(horasRestantes).padStart(2, '0')}:${String(minutosRestantes).padStart(2, '0')}`;
 
                 const fila = document.createElement('tr');
                 fila.innerHTML = `
@@ -294,11 +237,10 @@
                     const tiempoTranscurrido = new Date() - cliente.horaIngreso;
                     const tiempoEnSegundos = Math.floor(tiempoTranscurrido / 1000);
                     const tiempoEnMinutos = Math.floor(tiempoEnSegundos / 60);
-                    const tiempoEnHoras = Math.floor(tiempoEnMinutos / 60);
-                    const segundosRestantes = tiempoEnSegundos % 60;
+                    const horasRestantes = Math.floor(tiempoEnMinutos / 60);
                     const minutosRestantes = tiempoEnMinutos % 60;
 
-                    const tiempoFormateado = `${String(tiempoEnHoras).padStart(2, '0')}:${String(minutosRestantes).padStart(2, '0')}:${String(segundosRestantes).padStart(2, '0')}`;
+                    const tiempoFormateado = `${String(horasRestantes).padStart(2, '0')}:${String(minutosRestantes).padStart(2, '0')}`;
                     document.getElementById(`tiempo-${cliente.placa}`).textContent = tiempoFormateado;
                 }, 1000);
             });
@@ -308,7 +250,6 @@
         function mostrarTicket(placa, marca, horaIngreso) {
             const ticket = document.createElement('div');
             ticket.classList.add('ticket');
-
             const horaFormateada = new Date(horaIngreso).toLocaleString();
             ticket.innerHTML = `
                 <img src="IMAGEN1.jpg" alt="Logo">
@@ -318,11 +259,20 @@
                 <p>Hora de ingreso: ${horaFormateada}</p>
                 <p>Tarifa: Q${calcularTarifa(horaIngreso).toFixed(2)}</p>
                 <p>Gracias por preferirnos</p>
+                <button onclick="imprimirTicket(this)">Imprimir Ticket</button>
             `;
             document.body.appendChild(ticket);
+        }
 
-            // Imprimir automáticamente en la impresora térmica
-            window.print();
+        // Función para imprimir el ticket
+        function imprimirTicket(ticketButton) {
+            const ticket = ticketButton.parentElement;
+            const ventanaImpresion = window.open('', '', 'width=300,height=400');
+            ventanaImpresion.document.write('<html><body>');
+            ventanaImpresion.document.write(ticket.innerHTML);
+            ventanaImpresion.document.write('</body></html>');
+            ventanaImpresion.document.close();
+            ventanaImpresion.print();
         }
 
         // Función para retirar un vehículo
