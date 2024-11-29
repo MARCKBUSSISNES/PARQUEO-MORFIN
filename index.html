@@ -135,7 +135,21 @@
             border-radius: 10px;
             padding: 10px;
             background-color: #222;
+            display: flex;
+            justify-content: flex-start;
+            flex-wrap: wrap;
         }
+
+        .vehiculo {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            text-align: center;
+            flex: 1 0 20%;
+        }
+
     </style>
 </head>
 <body>
@@ -151,16 +165,8 @@
         <button id="btnIngresar">Ingresar Vehículo</button>
     </div>
 
-    <div class="tabla-vehiculos">
-        <table id="tablaClientes">
-            <tr>
-                <th>Placa</th>
-                <th>Marca</th>
-                <th>Tiempo en Parqueo</th>
-                <th>Tarifa</th>
-                <th>Acciones</th>
-            </tr>
-        </table>
+    <div class="tabla-vehiculos" id="tablaVehiculos">
+        <!-- Los vehículos ingresados se mostrarán aquí de izquierda a derecha -->
     </div>
 
     <div class="cierre">
@@ -194,65 +200,33 @@
             actualizarTabla();
         }
 
+        // Tarifas literales basadas en el tiempo exacto de parqueo con segundos.
         function calcularTarifa(horaIngreso) {
-            const tiempoEnParqueo = Math.floor((new Date() - horaIngreso) / 1000 / 60);
-            if (tiempoEnParqueo <= 5) return 0;
-            else if (tiempoEnParqueo <= 35) return 5.00;
-            else if (tiempoEnParqueo <= 65) return 8.00;
-            else if (tiempoEnParqueo <= 95) return 13.00;
-            else if (tiempoEnParqueo <= 125) return 16.00;
-            else if (tiempoEnParqueo <= 155) return 21.00;
-            else if (tiempoEnParqueo <= 185) return 24.00;
-            else if (tiempoEnParqueo <= 215) return 29.00;
-            else if (tiempoEnParqueo <= 245) return 32.00;
-            else if (tiempoEnParqueo <= 275) return 37.00;
-            else if (tiempoEnParqueo <= 305) return 40.00;
-            else if (tiempoEnParqueo <= 335) return 45.00;
-            else if (tiempoEnParqueo <= 365) return 48.00;
-            else if (tiempoEnParqueo <= 395) return 53.00;
-            else if (tiempoEnParqueo <= 425) return 56.00;
-            else if (tiempoEnParqueo <= 455) return 61.00;
-            else if (tiempoEnParqueo <= 485) return 64.00;
-            else if (tiempoEnParqueo <= 515) return 69.00;
-            else if (tiempoEnParqueo <= 545) return 72.00;
-            else if (tiempoEnParqueo <= 575) return 77.00;
-            else if (tiempoEnParqueo <= 605) return 80.00;
-            else if (tiempoEnParqueo <= 635) return 85.00;
-            else return 88.00;
-        }
-
-        function formatearTiempo(ms) {
-            const horas = Math.floor(ms / 3600);
-            const minutos = Math.floor((ms % 3600) / 60);
-            const segundos = ms % 60;
-            return `${String(horas).padStart(2, '0')}:${String(minutos).padStart(2, '0')}:${String(segundos).padStart(2, '0')}`;
-        }
-
-        function actualizarTabla() {
-            const tabla = document.getElementById('tablaClientes');
-            tabla.innerHTML = `
-                <tr>
-                    <th>Placa</th>
-                    <th>Marca</th>
-                    <th>Tiempo en Parqueo</th>
-                    <th>Tarifa</th>
-                    <th>Acciones</th>
-                </tr>
-            `;
-
-            clientes.forEach(cliente => {
-                const tiempoEnParqueo = Math.floor((new Date() - cliente.horaIngreso) / 1000);
-                const tarifa = calcularTarifa(cliente.horaIngreso);
-                const fila = document.createElement('tr');
-                fila.innerHTML = `
-                    <td>${cliente.placa}</td>
-                    <td>${cliente.marca}</td>
-                    <td>${formatearTiempo(tiempoEnParqueo)}</td>
-                    <td>${tarifa.toFixed(2)}</td>
-                    <td><button onclick="retirarVehiculo('${cliente.placa}')">Retirar</button></td>
-                `;
-                tabla.appendChild(fila);
-            });
+            const tiempoEnParqueo = Math.floor((new Date() - horaIngreso) / 1000);
+            
+            if (tiempoEnParqueo <= 5 * 60) return 0; // 0:00 - 5:00 Gratis
+            else if (tiempoEnParqueo <= 35 * 60) return 5.00; // 5:01 - 35:00 Q5
+            else if (tiempoEnParqueo <= 65 * 60) return 8.00; // 35:01 - 1:05:00 Q8
+            else if (tiempoEnParqueo <= 95 * 60) return 13.00; // 1:05:01 - 1:35:00 Q13
+            else if (tiempoEnParqueo <= 125 * 60) return 16.00; // 1:35:01 - 2:05:00 Q16
+            else if (tiempoEnParqueo <= 155 * 60) return 21.00; // 2:05:01 - 2:35:00 Q21
+            else if (tiempoEnParqueo <= 185 * 60) return 24.00; // 2:35:01 - 3:05:00 Q24
+            else if (tiempoEnParqueo <= 215 * 60) return 29.00; // 3:05:01 - 3:35:00 Q29
+            else if (tiempoEnParqueo <= 245 * 60) return 32.00; // 3:35:01 - 4:05:00 Q32
+            else if (tiempoEnParqueo <= 275 * 60) return 37.00; // 4:05:01 - 4:35:00 Q37
+            else if (tiempoEnParqueo <= 305 * 60) return 40.00; // 4:35:01 - 5:05:00 Q40
+            else if (tiempoEnParqueo <= 335 * 60) return 45.00; // 5:05:01 - 5:35:00 Q45
+            else if (tiempoEnParqueo <= 365 * 60) return 48.00; // 5:35:01 - 6:05:00 Q48
+            else if (tiempoEnParqueo <= 395 * 60) return 53.00; // 6:05:01 - 6:35:00 Q53
+            else if (tiempoEnParqueo <= 425 * 60) return 56.00; // 6:35:01 - 7:05:00 Q56
+            else if (tiempoEnParqueo <= 455 * 60) return 61.00; // 7:05:01 - 7:35:00 Q61
+            else if (tiempoEnParqueo <= 485 * 60) return 64.00; // 7:35:01 - 8:05:00 Q64
+            else if (tiempoEnParqueo <= 515 * 60) return 69.00; // 8:05:01 - 8:35:00 Q69
+            else if (tiempoEnParqueo <= 545 * 60) return 72.00; // 8:35:01 - 9:05:00 Q72
+            else if (tiempoEnParqueo <= 575 * 60) return 77.00; // 9:05:01 - 9:35:00 Q77
+            else if (tiempoEnParqueo <= 605 * 60) return 80.00; // 9:35:01 - 10:05:00 Q80
+            else if (tiempoEnParqueo <= 635 * 60) return 85.00; // 10:05:01 - 10:35:00 Q85
+            else return 88.00; // 10:35:01 - 11:05:00 Q88
         }
 
         function mostrarTicket(placa, marca, horaIngreso) {
@@ -280,13 +254,31 @@
             ventanaImpresion.print();
         }
 
-        function retirarVehiculo(placa) {
-            const vehiculo = clientes.find(v => v.placa === placa);
-            const tarifa = calcularTarifa(vehiculo.horaIngreso);
-            clientes = clientes.filter(v => v.placa !== placa);
-            localStorage.setItem('vehiculos', JSON.stringify(clientes));
-            actualizarTabla();
-            alert(`El vehículo con placa ${placa} ha sido retirado. Total a pagar: Q${tarifa.toFixed(2)}`);
+        function actualizarTabla() {
+            const tabla = document.getElementById('tablaVehiculos');
+            tabla.innerHTML = ''; // Limpiar la tabla antes de actualizarla
+
+            clientes.forEach(cliente => {
+                const tiempoEnParqueo = Math.floor((new Date() - cliente.horaIngreso) / 1000);
+                const tarifa = calcularTarifa(cliente.horaIngreso);
+
+                const vehiculoDiv = document.createElement('div');
+                vehiculoDiv.classList.add('vehiculo');
+                vehiculoDiv.innerHTML = `
+                    <p><strong>Placa:</strong> ${cliente.placa}</p>
+                    <p><strong>Marca:</strong> ${cliente.marca}</p>
+                    <p><strong>Tiempo:</strong> ${formatearTiempo(tiempoEnParqueo)}</p>
+                    <p><strong>Tarifa:</strong> Q${tarifa.toFixed(2)}</p>
+                `;
+                tabla.appendChild(vehiculoDiv);
+            });
+        }
+
+        function formatearTiempo(segundos) {
+            const horas = Math.floor(segundos / 3600);
+            const minutos = Math.floor((segundos % 3600) / 60);
+            const segundosRestantes = segundos % 60;
+            return `${horas}:${minutos}:${segundosRestantes}`;
         }
 
         function hacerCierre() {
@@ -318,4 +310,3 @@
     </script>
 </body>
 </html>
-
