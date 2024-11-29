@@ -213,8 +213,8 @@
             clientes.push({ placa, marca, horaIngreso, cronometroId: startCronometro(horaIngreso) });
             localStorage.setItem('vehiculos', JSON.stringify(clientes));
             actualizarTabla();
-            document.getElementById('placa').value = '';
-            document.getElementById('marca').value = '';
+            document.getElementById('placa').value = ''; // Limpiar el campo de placa
+            document.getElementById('marca').value = ''; // Limpiar el campo de marca
         }
 
         // Función para iniciar el cronómetro
@@ -255,20 +255,13 @@
         function hacerCierre() {
             const clave = prompt("Ingrese la clave para realizar el cierre del día:");
             if (clave !== "Multicars") {
-                alert("Clave incorrecta. No se puede realizar el cierre.");
+                alert("Clave incorrecta.");
                 return;
             }
-
-            if (vehiculosRetirados.length === 0) {
-                alert("No hay registros de vehículos retirados para el cierre.");
-                return;
-            }
-
             let total = 0;
             vehiculosRetirados.forEach(vehiculo => {
                 total += vehiculo.tarifaCobrada;
             });
-
             alert(`Cierre del Día\nTotal Cobrado: Q${total.toFixed(2)}`);
         }
 
@@ -284,7 +277,6 @@
                     <th>Acciones</th>
                 </tr>
             `;
-
             clientes.forEach(cliente => {
                 const tiempoTranscurrido = Math.floor((new Date() - cliente.horaIngreso) / 1000 / 60);
                 const fila = document.createElement('tr');
@@ -323,13 +315,6 @@
                 `;
                 tablaRetirados.appendChild(fila);
             });
-        }
-
-        // Función para eliminar un vehículo retirado
-        function eliminarVehiculoRetirado(placa) {
-            vehiculosRetirados = vehiculosRetirados.filter(v => v.placa !== placa);
-            localStorage.setItem('vehiculosRetirados', JSON.stringify(vehiculosRetirados));
-            actualizarTablaRetirados();
         }
 
         // Inicializar tablas
