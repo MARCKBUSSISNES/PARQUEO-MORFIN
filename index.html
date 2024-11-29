@@ -120,6 +120,7 @@
         .ticket img {
             width: 60mm;
             height: auto;
+            margin-bottom: 10px;
         }
 
         .ticket p {
@@ -127,6 +128,15 @@
             font-size: 16px;
         }
 
+        /* Estilo para tabla de parqueo */
+        .tabla-vehiculos {
+            margin: 20px auto;
+            width: 80%;
+            border: 1px solid #FF6F00;
+            border-radius: 10px;
+            padding: 10px;
+            background-color: #263a53;
+        }
     </style>
 </head>
 <body>
@@ -146,15 +156,17 @@
     </div>
 
     <!-- Tabla para mostrar los vehículos registrados -->
-    <table id="tablaClientes">
-        <tr>
-            <th>Placa</th>
-            <th>Marca</th>
-            <th>Tiempo en Parqueo</th>
-            <th>Tarifa</th>
-            <th>Acciones</th>
-        </tr>
-    </table>
+    <div class="tabla-vehiculos">
+        <table id="tablaClientes">
+            <tr>
+                <th>Placa</th>
+                <th>Marca</th>
+                <th>Tiempo en Parqueo</th>
+                <th>Tarifa</th>
+                <th>Acciones</th>
+            </tr>
+        </table>
+    </div>
 
     <div class="cierre">
         <button onclick="hacerCierre()">Cierre del Día</button>
@@ -221,7 +233,7 @@
                 const tiempoEnMinutos = Math.floor(tiempoEnSegundos / 60);
                 const horasRestantes = Math.floor(tiempoEnMinutos / 60);
                 const minutosRestantes = tiempoEnMinutos % 60;
-                const tiempoFormateado = `${String(horasRestantes).padStart(2, '0')}:${String(minutosRestantes).padStart(2, '0')}`;
+                const tiempoFormateado = `${String(horasRestantes).padStart(2, '0')}:${String(minutosRestantes).padStart(2, '0')}:${String(tiempoEnSegundos % 60).padStart(2, '0')}`;
 
                 const fila = document.createElement('tr');
                 fila.innerHTML = `
@@ -240,24 +252,22 @@
                     const horasRestantes = Math.floor(tiempoEnMinutos / 60);
                     const minutosRestantes = tiempoEnMinutos % 60;
 
-                    const tiempoFormateado = `${String(horasRestantes).padStart(2, '0')}:${String(minutosRestantes).padStart(2, '0')}`;
+                    const tiempoFormateado = `${String(horasRestantes).padStart(2, '0')}:${String(minutosRestantes).padStart(2, '0')}:${String(tiempoEnSegundos % 60).padStart(2, '0')}`;
                     document.getElementById(`tiempo-${cliente.placa}`).textContent = tiempoFormateado;
                 }, 1000);
             });
         }
 
-        // Función para generar y mostrar el ticket de parqueo
+        // Función para mostrar el ticket de parqueo
         function mostrarTicket(placa, marca, horaIngreso) {
             const ticket = document.createElement('div');
             ticket.classList.add('ticket');
-            const horaFormateada = new Date(horaIngreso).toLocaleString();
             ticket.innerHTML = `
                 <img src="IMAGEN1.jpg" alt="Logo">
-                <p><strong>Ticket de Parqueo</strong></p>
-                <p>Placa: ${placa}</p>
-                <p>Marca: ${marca}</p>
-                <p>Hora de ingreso: ${horaFormateada}</p>
-                <p>Tarifa: Q${calcularTarifa(horaIngreso).toFixed(2)}</p>
+                <p><strong>Placa:</strong> ${placa}</p>
+                <p><strong>Marca:</strong> ${marca}</p>
+                <p><strong>Hora de Ingreso:</strong> ${horaIngreso.toLocaleString()}</p>
+                <p><strong>Tarifa:</strong> Q${calcularTarifa(horaIngreso).toFixed(2)}</p>
                 <p>Gracias por preferirnos</p>
                 <button onclick="imprimirTicket(this)">Imprimir Ticket</button>
             `;
@@ -314,4 +324,3 @@
     </script>
 </body>
 </html>
-
