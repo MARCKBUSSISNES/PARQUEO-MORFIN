@@ -26,6 +26,16 @@
             object-fit: cover;
         }
 
+        /* Estilo para la imagen en la esquina superior izquierda */
+        .imagen-izquierda {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            width: 100px; /* Ajusta el tamaño de la imagen */
+            height: auto;
+            z-index: 10;
+        }
+
         button {
             background-color: #FF6F00;
             color: white;
@@ -101,6 +111,9 @@
     </style>
 </head>
 <body>
+    <!-- Imagen en la esquina superior izquierda -->
+    <img src="IMAGEN1.jpg" alt="Imagen de Encabezado" class="imagen-izquierda">
+
     <header>
         <img src="https://raw.githubusercontent.com/usuario/repositorio/main/images/Dise%C3%B1o%20sin%20titulo.png" alt="Encabezado del Parqueo">
     </header>
@@ -233,7 +246,7 @@
             // Actualizar la tabla
             actualizarTabla();
 
-            alert(`El vehículo con placa ${placa} ha sido retirado. Tarifa cobrada: Q${tarifa.toFixed(2)}`);
+            alert(`El vehículo con placa ${placa} ha sido retirado. Total a pagar: Q${tarifa.toFixed(2)}`);
         }
 
         // Función para hacer el cierre del día
