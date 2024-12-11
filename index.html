@@ -3,318 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>REGISTRO DE VEHICULOS</title>
+    <title>Visualización de Excel</title>
     <style>
-        body {
-            background-color: #1c1c1c;
-            color: white;
-            font-family: Arial, sans-serif;
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
 
-        .encabezado {
-            background-color: #e60000;
-            color: white;
-            text-align: center;
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
             padding: 20px;
-            font-size: 36px;
-            font-weight: bold;
         }
 
-        .imagen-izquierda {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            width: 120px;
-            height: auto;
-            z-index: 10;
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
-        button {
-            background-color: #e60000;
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        #table-container {
+            margin-top: 20px;
+        }
+
+        input[type="file"] {
+            display: block;
+            margin: 20px auto;
+            padding: 10px;
+            background-color: #28a745;
             color: white;
             border: none;
-            padding: 10px 20px;
-            cursor: pointer;
             border-radius: 5px;
-            font-size: 16px;
-            width: 100%;
+            cursor: pointer;
         }
 
-        button:hover {
-            background-color: #b30000;
-        }
-
-        .formulario {
-            text-align: center;
-            margin: 30px auto;
-            max-width: 500px;
+        input[type="file"]:hover {
+            background-color: #218838;
         }
 
         table {
             width: 100%;
-            margin-top: 20px;
             border-collapse: collapse;
-            background-color: #333;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
         }
 
         th, td {
-            padding: 12px;
+            padding: 8px;
             text-align: center;
         }
 
         th {
-            background-color: #e60000;
+            background-color: #f8f9fa;
         }
 
-        td {
-            background-color: #222;
-        }
-
-        input {
-            padding: 12px;
-            margin: 5px;
-            border-radius: 5px;
-            border: 1px solid #e60000;
-            font-size: 16px;
-            color: #333;
-            width: 100%;
-        }
-
-        .cierre {
-            margin: 40px auto;
-            max-width: 500px;
-            text-align: center;
-        }
-
-        footer {
-            background-color: #333;
-            color: white;
-            padding: 10px 0;
-            text-align: center;
-            font-size: 12px;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-        }
-
-        footer p {
-            margin: 0;
-        }
-
-        .ticket {
-            width: 80mm; 
-            margin: 0;
-            padding: 10px;
-            border: 1px dashed #e60000;
-            text-align: center;
-            font-size: 18px;
-            background-color: white;
-            color: black;
-            font-family: "Courier New", Courier, monospace;
-            line-height: 1.5;
-            margin-bottom: 20px;
-        }
-
-        .ticket img {
-            width: 60mm;
-            height: auto;
-            margin-bottom: 10px;
-        }
-
-        .ticket p {
-            margin: 5px;
-            font-size: 16px;
-        }
-
-        .tabla-vehiculos {
-            margin: 20px auto;
-            width: 80%;
-            border: 1px solid #e60000;
-            border-radius: 10px;
-            padding: 10px;
-            background-color: #222;
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
         }
     </style>
 </head>
 <body>
-    <div class="encabezado">
-        Multicars
+    <div class="container">
+        <h1>Datos del Archivo Excel</h1>
+        <div>
+            <input type="file" id="excel-file" accept=".xlsx, .xls"/>
+        </div>
+        <div id="table-container">
+            <!-- La tabla se insertará aquí -->
+        </div>
     </div>
 
-    <img src="IMAGEN1.jpg" alt="Logo" class="imagen-izquierda">
-
-    <div class="formulario">
-        <input type="text" id="placa" placeholder="Placa del vehículo">
-        <input type="text" id="marca" placeholder="Marca del vehículo">
-        <button id="btnIngresar">Ingresar Vehículo</button>
-    </div>
-
-    <div class="tabla-vehiculos">
-        <table id="tablaClientes">
-            <tr>
-                <th>Placa</th>
-                <th>Marca</th>
-                <th>Tiempo en Parqueo</th>
-                <th>Tarifa</th>
-                <th>Acciones</th>
-            </tr>
-        </table>
-    </div>
-
-    <div class="cierre">
-        <button onclick="hacerCierre()">Cierre del Día</button>
-    </div>
-
-    <footer>
-        <p>MarckBusiness | Todos los derechos reservados</p>
-    </footer>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script> <!-- SheetJS -->
     <script>
-        let clientes = JSON.parse(localStorage.getItem('vehiculos')) || [];
+        document.getElementById('excel-file').addEventListener('change', handleFile, false);
 
-        function ingresarVehiculo() {
-            const placa = document.getElementById('placa').value.trim();
-            const marca = document.getElementById('marca').value.trim();
+        function handleFile(event) {
+            var file = event.target.files[0];
 
-            if (!placa || !marca) {
-                alert('Por favor, complete todos los campos.');
+            // Verificamos que el archivo sea un archivo Excel
+            if (!file) return;
+            if (!file.name.endsWith('.xlsx') && !file.name.endsWith('.xls')) {
+                alert('Por favor, selecciona un archivo Excel.');
                 return;
             }
 
-            const horaIngreso = new Date();
-            clientes.push({ placa, marca, horaIngreso });
-            localStorage.setItem('vehiculos', JSON.stringify(clientes));
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var data = e.target.result;
+                var workbook = XLSX.read(data, { type: 'binary' });
 
-            document.getElementById('placa').value = '';
-            document.getElementById('marca').value = '';
+                // Obtener la primera hoja del archivo Excel
+                var sheetName = workbook.SheetNames[0]; // Puedes cambiar el índice si quieres otra hoja
+                var sheet = workbook.Sheets[sheetName];
 
-            mostrarTicket(placa, marca, horaIngreso);
-            actualizarTabla();
+                // Convertir los datos de la hoja en una tabla HTML
+                var htmlTable = XLSX.utils.sheet_to_html(sheet);
+                
+                // Insertar la tabla en el contenedor
+                document.getElementById('table-container').innerHTML = htmlTable;
+            };
+
+            reader.readAsBinaryString(file);
         }
-
-        function calcularTarifa(horaIngreso) {
-            const tiempoEnParqueo = Math.floor((new Date() - horaIngreso) / 1000 / 60);
-            if (tiempoEnParqueo <= 5) return 0;
-            else if (tiempoEnParqueo <= 35) return 5.00;
-            else if (tiempoEnParqueo <= 65) return 8.00;
-            else if (tiempoEnParqueo <= 95) return 13.00;
-            else if (tiempoEnParqueo <= 125) return 16.00;
-            else if (tiempoEnParqueo <= 155) return 21.00;
-            else if (tiempoEnParqueo <= 185) return 24.00;
-            else if (tiempoEnParqueo <= 215) return 29.00;
-            else if (tiempoEnParqueo <= 245) return 32.00;
-            else if (tiempoEnParqueo <= 275) return 37.00;
-            else if (tiempoEnParqueo <= 305) return 40.00;
-            else if (tiempoEnParqueo <= 335) return 45.00;
-            else if (tiempoEnParqueo <= 365) return 48.00;
-            else if (tiempoEnParqueo <= 395) return 53.00;
-            else if (tiempoEnParqueo <= 425) return 56.00;
-            else if (tiempoEnParqueo <= 455) return 61.00;
-            else if (tiempoEnParqueo <= 485) return 64.00;
-            else if (tiempoEnParqueo <= 515) return 69.00;
-            else if (tiempoEnParqueo <= 545) return 72.00;
-            else if (tiempoEnParqueo <= 575) return 77.00;
-            else if (tiempoEnParqueo <= 605) return 80.00;
-            else if (tiempoEnParqueo <= 635) return 85.00;
-            else return 88.00;
-        }
-
-        function formatearTiempo(ms) {
-            const horas = Math.floor(ms / 3600);
-            const minutos = Math.floor((ms % 3600) / 60);
-            const segundos = ms % 60;
-            return `${String(horas).padStart(2, '0')}:${String(minutos).padStart(2, '0')}:${String(segundos).padStart(2, '0')}`;
-        }
-
-        function actualizarTabla() {
-            const tabla = document.getElementById('tablaClientes');
-            tabla.innerHTML = `
-                <tr>
-                    <th>Placa</th>
-                    <th>Marca</th>
-                    <th>Tiempo en Parqueo</th>
-                    <th>Tarifa</th>
-                    <th>Acciones</th>
-                </tr>
-            `;
-
-            clientes.forEach(cliente => {
-                const tiempoEnParqueo = Math.floor((new Date() - cliente.horaIngreso) / 1000);
-                const tarifa = calcularTarifa(cliente.horaIngreso);
-                const fila = document.createElement('tr');
-                fila.innerHTML = `
-                    <td>${cliente.placa}</td>
-                    <td>${cliente.marca}</td>
-                    <td>${formatearTiempo(tiempoEnParqueo)}</td>
-                    <td>${tarifa.toFixed(2)}</td>
-                    <td><button onclick="retirarVehiculo('${cliente.placa}')">Retirar</button></td>
-                `;
-                tabla.appendChild(fila);
-            });
-        }
-
-        function mostrarTicket(placa, marca, horaIngreso) {
-            const ticket = document.createElement('div');
-            ticket.classList.add('ticket');
-            ticket.innerHTML = `
-                <img src="IMAGEN1.jpg" alt="Logo">
-                <p><strong>Placa:</strong> ${placa}</p>
-                <p><strong>Marca:</strong> ${marca}</p>
-                <p><strong>Hora de Ingreso:</strong> ${horaIngreso.toLocaleString()}</p>
-                <p><strong>Tarifa:</strong> Q${calcularTarifa(horaIngreso).toFixed(2)}</p>
-                <p>Gracias por preferirnos</p>
-                <button onclick="imprimirTicket(this)">Imprimir Ticket</button>
-            `;
-            document.body.appendChild(ticket);
-        }
-
-        function imprimirTicket(ticketButton) {
-            const ticket = ticketButton.parentElement;
-            const ventanaImpresion = window.open('', '', 'width=300,height=400');
-            ventanaImpresion.document.write('<html><body>');
-            ventanaImpresion.document.write(ticket.innerHTML);
-            ventanaImpresion.document.write('</body></html>');
-            ventanaImpresion.document.close();
-            ventanaImpresion.print();
-        }
-
-        function retirarVehiculo(placa) {
-            const vehiculo = clientes.find(v => v.placa === placa);
-            const tarifa = calcularTarifa(vehiculo.horaIngreso);
-            clientes = clientes.filter(v => v.placa !== placa);
-            localStorage.setItem('vehiculos', JSON.stringify(clientes));
-            actualizarTabla();
-            alert(`El vehículo con placa ${placa} ha sido retirado. Total a pagar: Q${tarifa.toFixed(2)}`);
-        }
-
-        function hacerCierre() {
-            let totalRecaudado = 0;
-            const detalles = clientes.map(cliente => {
-                const tarifa = calcularTarifa(cliente.horaIngreso);
-                totalRecaudado += tarifa;
-                return `
-                    Placa: ${cliente.placa} | Marca: ${cliente.marca} | 
-                    Hora Ingreso: ${cliente.horaIngreso.toLocaleString()} | Tarifa: Q${tarifa.toFixed(2)}
-                `;
-            }).join('<br>');
-            
-            const cierreTicket = `
-                <div class="ticket">
-                    <h2>Cierre del Día</h2>
-                    <p>${detalles}</p>
-                    <p><strong>Total Recaudado:</strong> Q${totalRecaudado.toFixed(2)}</p>
-                    <button onclick="imprimirTicket(this)">Imprimir Cierre</button>
-                </div>
-            `;
-            document.body.innerHTML = cierreTicket;
-        }
-
-        document.getElementById('btnIngresar').addEventListener('click', ingresarVehiculo);
-
-        // Actualizar la tabla cada segundo
-        setInterval(actualizarTabla, 1000);
     </script>
 </body>
 </html>
