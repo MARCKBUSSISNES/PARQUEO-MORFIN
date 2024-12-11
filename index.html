@@ -3,120 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visualización de Excel</title>
+    <title>Comandas en Tiempo Real</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
             font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
             background-color: #f4f4f4;
-            padding: 20px;
         }
-
         .container {
-            max-width: 1200px;
+            width: 80%;
             margin: 0 auto;
-            padding: 20px;
-            background-color: white;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
-
-        h1 {
-            text-align: center;
-            color: #333;
+        .product-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
         }
-
-        #table-container {
-            margin-top: 20px;
-        }
-
-        input[type="file"] {
-            display: block;
-            margin: 20px auto;
+        .product {
+            background-color: #fff;
+            border: 1px solid #ddd;
             padding: 10px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 5px;
+            text-align: center;
+            width: 100px;
             cursor: pointer;
+            transition: background-color 0.3s;
         }
-
-        input[type="file"]:hover {
-            background-color: #218838;
+        .product:hover {
+            background-color: #eaeaea;
         }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            text-align: left;
-        }
-
-        table, th, td {
+        #order-summary {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #fff;
             border: 1px solid #ddd;
         }
-
-        th, td {
-            padding: 8px;
-            text-align: center;
+        #order-summary ul {
+            list-style-type: none;
+            padding: 0;
         }
-
-        th {
-            background-color: #f8f9fa;
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
         }
-
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
+        .remove-btn {
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+        }
+        .remove-btn:hover {
+            background-color: darkred;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Datos del Archivo Excel</h1>
-        <div>
-            <input type="file" id="excel-file" accept=".xlsx, .xls"/>
-        </div>
-        <div id="table-container">
-            <!-- La tabla se insertará aquí -->
-        </div>
+
+<div class="container">
+    <h1>Comandas en Tiempo Real</h1>
+    
+    <div class="product-list">
+        <div class="product" onclick="addProduct('Hamburguesa')">Hamburguesa</div>
+        <div class="product" onclick="addProduct('Pizza')">Pizza</div>
+        <div class="product" onclick="addProduct('Tacos')">Tacos</div>
+        <div class="product" onclick="addProduct('Ensalada')">Ensalada</div>
+        <div class="product" onclick="addProduct('Sopa')">Sopa</div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script> <!-- SheetJS -->
-    <script>
-        document.getElementById('excel-file').addEventListener('change', handleFile, false);
+    <div id="order-summary">
+        <h3>Comanda Actual</h3>
+        <ul id="order-list">
+            <!-- Los productos agregados se mostrarán aquí -->
+        </ul>
+    </div>
+</div>
 
-        function handleFile(event) {
-            var file = event.target.files[0];
+<script>
+    // Función para agregar productos al pedido
+    function addProduct(product) {
+        let orders = JSON.parse(localStorage.getItem('orders')) || [];
 
-            // Verificamos que el archivo sea un archivo Excel
-            if (!file) return;
-            if (!file.name.endsWith('.xlsx') && !file.name.endsWith('.xls')) {
-                alert('Por favor, selecciona un archivo Excel.');
-                return;
-            }
+        // Añadir el producto al pedido
+        orders.push(product);
+        localStorage.setItem('orders', JSON.stringify(orders));
 
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                var data = e.target.result;
-                var workbook = XLSX.read(data, { type: 'binary' });
+        // Actualizar la vista
+        updateOrderSummary();
+    }
 
-                // Obtener la primera hoja del archivo Excel
-                var sheetName = workbook.SheetNames[0]; // Puedes cambiar el índice si quieres otra hoja
-                var sheet = workbook.Sheets[sheetName];
+    // Función para borrar un producto de la comanda
+    function removeProduct(index) {
+        let orders = JSON.parse(localStorage.getItem('orders')) || [];
 
-                // Convertir los datos de la hoja en una tabla HTML
-                var htmlTable = XLSX.utils.sheet_to_html(sheet);
-                
-                // Insertar la tabla en el contenedor
-                document.getElementById('table-container').innerHTML = htmlTable;
-            };
+        // Eliminar el producto por su índice
+        orders.splice(index, 1);
+        localStorage.setItem('orders', JSON.stringify(orders));
 
-            reader.readAsBinaryString(file);
-        }
-    </script>
+        // Actualizar la vista
+        updateOrderSummary();
+    }
+
+    // Función para actualizar la lista de productos en la página
+    function updateOrderSummary() {
+        let orders = JSON.parse(localStorage.getItem('orders')) || [];
+        let orderList = document.getElementById('order-list');
+        
+        // Limpiar la lista antes de agregar los elementos
+        orderList.innerHTML = '';
+
+        orders.forEach((order, index) => {
+            let listItem = document.createElement('li');
+            listItem.classList.add('order-item');
+            listItem.innerHTML = `
+                <span>${order}</span>
+                <button class="remove-btn" onclick="removeProduct(${index})">Borrar</button>
+            `;
+            orderList.appendChild(listItem);
+        });
+    }
+
+    // Llamar a la función para cargar la lista al iniciar la página
+    window.onload = function() {
+        updateOrderSummary();
+    };
+</script>
+
 </body>
 </html>
