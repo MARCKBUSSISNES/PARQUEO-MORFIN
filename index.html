@@ -1,136 +1,75 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comandas en Tiempo Real</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
-        .container {
-            width: 80%;
-            margin: 0 auto;
-        }
-        .product-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin: 20px 0;
-        }
-        .product {
-            background-color: #fff;
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: center;
-            width: 100px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .product:hover {
-            background-color: #eaeaea;
-        }
-        #order-summary {
-            margin-top: 30px;
-            padding: 15px;
-            background-color: #fff;
-            border: 1px solid #ddd;
-        }
-        #order-summary ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        .order-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        .remove-btn {
-            background-color: red;
-            color: white;
-            border: none;
-            padding: 5px;
-            cursor: pointer;
-        }
-        .remove-btn:hover {
-            background-color: darkred;
-        }
-    </style>
-</head>
-<body>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f4f4f4;
+}
 
-<div class="container">
-    <h1>Comandas en Tiempo Real</h1>
-    
-    <div class="product-list">
-        <div class="product" onclick="addProduct('Hamburguesa')">Hamburguesa</div>
-        <div class="product" onclick="addProduct('Pizza')">Pizza</div>
-        <div class="product" onclick="addProduct('Tacos')">Tacos</div>
-        <div class="product" onclick="addProduct('Ensalada')">Ensalada</div>
-        <div class="product" onclick="addProduct('Sopa')">Sopa</div>
-    </div>
+.container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 500px;
+}
 
-    <div id="order-summary">
-        <h3>Comanda Actual</h3>
-        <ul id="order-list">
-            <!-- Los productos agregados se mostrarán aquí -->
-        </ul>
-    </div>
-</div>
+h1, h2 {
+    color: #333;
+}
 
-<script>
-    // Función para agregar productos al pedido
-    function addProduct(product) {
-        let orders = JSON.parse(localStorage.getItem('orders')) || [];
+label {
+    font-size: 14px;
+    margin-top: 10px;
+}
 
-        // Añadir el producto al pedido
-        orders.push(product);
-        localStorage.setItem('orders', JSON.stringify(orders));
+input {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
 
-        // Actualizar la vista
-        updateOrderSummary();
-    }
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+}
 
-    // Función para borrar un producto de la comanda
-    function removeProduct(index) {
-        let orders = JSON.parse(localStorage.getItem('orders')) || [];
+button:hover {
+    background-color: #45a049;
+}
 
-        // Eliminar el producto por su índice
-        orders.splice(index, 1);
-        localStorage.setItem('orders', JSON.stringify(orders));
+ul {
+    list-style-type: none;
+    padding: 0;
+}
 
-        // Actualizar la vista
-        updateOrderSummary();
-    }
+li {
+    padding: 8px;
+    border-bottom: 1px solid #ccc;
+}
 
-    // Función para actualizar la lista de productos en la página
-    function updateOrderSummary() {
-        let orders = JSON.parse(localStorage.getItem('orders')) || [];
-        let orderList = document.getElementById('order-list');
-        
-        // Limpiar la lista antes de agregar los elementos
-        orderList.innerHTML = '';
+#downloadPDF {
+    background-color: #008CBA;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 20px;
+}
 
-        orders.forEach((order, index) => {
-            let listItem = document.createElement('li');
-            listItem.classList.add('order-item');
-            listItem.innerHTML = `
-                <span>${order}</span>
-                <button class="remove-btn" onclick="removeProduct(${index})">Borrar</button>
-            `;
-            orderList.appendChild(listItem);
-        });
-    }
-
-    // Llamar a la función para cargar la lista al iniciar la página
-    window.onload = function() {
-        updateOrderSummary();
-    };
-</script>
-
-</body>
-</html>
+#downloadPDF:hover {
+    background-color: #007B8B;
+}
