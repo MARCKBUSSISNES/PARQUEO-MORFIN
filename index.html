@@ -1,75 +1,178 @@
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #f4f4f4;
-}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Clientes</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
 
-.container {
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 500px;
-}
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 500px;
+        }
 
-h1, h2 {
-    color: #333;
-}
+        h1, h2 {
+            color: #333;
+        }
 
-label {
-    font-size: 14px;
-    margin-top: 10px;
-}
+        label {
+            font-size: 14px;
+            margin-top: 10px;
+        }
 
-input {
-    width: 100%;
-    padding: 8px;
-    margin: 5px 0;
-    font-size: 14px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-}
+        input {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            font-size: 14px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
 
-button {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    width: 100%;
-}
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
 
-button:hover {
-    background-color: #45a049;
-}
+        button:hover {
+            background-color: #45a049;
+        }
 
-ul {
-    list-style-type: none;
-    padding: 0;
-}
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
 
-li {
-    padding: 8px;
-    border-bottom: 1px solid #ccc;
-}
+        li {
+            padding: 8px;
+            border-bottom: 1px solid #ccc;
+        }
 
-#downloadPDF {
-    background-color: #008CBA;
-    color: white;
-    padding: 10px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    width: 100%;
-    margin-top: 20px;
-}
+        #downloadPDF {
+            background-color: #008CBA;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+        }
 
-#downloadPDF:hover {
-    background-color: #007B8B;
-}
+        #downloadPDF:hover {
+            background-color: #007B8B;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Gestión de Clientes</h1>
+        
+        <form id="clientForm">
+            <label for="name">Nombre:</label>
+            <input type="text" id="name" placeholder="Nombre del cliente" required>
+
+            <label for="email">Correo electrónico:</label>
+            <input type="email" id="email" placeholder="Correo del cliente" required>
+
+            <label for="phone">Teléfono:</label>
+            <input type="text" id="phone" placeholder="Teléfono del cliente" required>
+
+            <button type="submit">Añadir Cliente</button>
+        </form>
+
+        <h2>Clientes Registrados</h2>
+        <ul id="clientsList"></ul>
+
+        <button id="downloadPDF">Generar PDF</button>
+    </div>
+
+    <script>
+        const { jsPDF } = window.jspdf;
+
+        // Obtener elementos
+        const form = document.getElementById('clientForm');
+        const clientsList = document.getElementById('clientsList');
+        const downloadPDFButton = document.getElementById('downloadPDF');
+        
+        // Cargar clientes almacenados en LocalStorage
+        document.addEventListener('DOMContentLoaded', loadClients);
+
+        // Agregar cliente al listado
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+
+            const client = { name, email, phone };
+
+            // Guardar cliente en LocalStorage
+            saveClient(client);
+            loadClients();
+
+            // Limpiar formulario
+            form.reset();
+        });
+
+        // Guardar cliente en LocalStorage
+        function saveClient(client) {
+            let clients = JSON.parse(localStorage.getItem('clients')) || [];
+            clients.push(client);
+            localStorage.setItem('clients', JSON.stringify(clients));
+        }
+
+        // Cargar clientes desde LocalStorage
+        function loadClients() {
+            let clients = JSON.parse(localStorage.getItem('clients')) || [];
+            clientsList.innerHTML = '';
+            clients.forEach(client => {
+                const li = document.createElement('li');
+                li.textContent = `Nombre: ${client.name}, Correo: ${client.email}, Teléfono: ${client.phone}`;
+                clientsList.appendChild(li);
+            });
+        }
+
+        // Generar PDF con los datos de los clientes
+        downloadPDFButton.addEventListener('click', function () {
+            let doc = new jsPDF();
+
+            let clients = JSON.parse(localStorage.getItem('clients')) || [];
+            let yPosition = 10;
+            
+            doc.text('Clientes Registrados', 10, yPosition);
+            yPosition += 10;
+
+            clients.forEach(client => {
+                doc.text(`Nombre: ${client.name}`, 10, yPosition);
+                yPosition += 10;
+                doc.text(`Correo: ${client.email}`, 10, yPosition);
+                yPosition += 10;
+                doc.text(`Teléfono: ${client.phone}`, 10, yPosition);
+                yPosition += 15;
+            });
+
+            doc.save('clientes.pdf');
+        });
+    </script>
+</body>
+</html>
