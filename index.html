@@ -1,82 +1,154 @@
-<?php
-// Ruta del archivo JSON donde se guardarán las propinas
-$jsonFile = 'propinas.json';
-
-// Leer las propinas guardadas (si existen)
-if (file_exists($jsonFile)) {
-    $propinas = json_decode(file_get_contents($jsonFile), true);
-} else {
-    $propinas = [];
-}
-
-// Manejo del formulario y registro de propinas
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Obtener los datos del formulario
-    $id_usuario = $_POST['id_usuario'];
-    $fecha = date('Y-m-d');  // Fecha actual
-    $monto = $_POST['monto'];
-
-    // Crear un array con los datos de la nueva propina
-    $nueva_propina = [
-        'id_usuario' => $id_usuario,
-        'fecha' => $fecha,
-        'monto' => $monto
-    ];
-
-    // Agregar la nueva propina al array
-    $propinas[] = $nueva_propina;
-
-    // Guardar los datos actualizados en el archivo JSON
-    file_put_contents($jsonFile, json_encode($propinas, JSON_PRETTY_PRINT));
-
-    // Generar el PDF con los datos de la propina
-    require('fpdf/fpdf.php');  // Librería para generar el PDF
-    $pdf = new FPDF();
-    $pdf->AddPage();
-    $pdf->SetFont('Arial', 'B', 12);
-    $pdf->Cell(200, 10, 'Propina Registrada', 0, 1, 'C');
-    $pdf->Ln(10);
-    $pdf->Cell(50, 10, "ID Usuario: " . $id_usuario);
-    $pdf->Ln(10);
-    $pdf->Cell(50, 10, "Fecha: " . $fecha);
-    $pdf->Ln(10);
-    $pdf->Cell(50, 10, "Monto: " . $monto);
-    $pdf->Ln(20);
-
-    // Guardar el PDF en el servidor
-    $pdf->Output('F', 'propinas/propina_' . $id_usuario . '.pdf');
-
-    // Enviar el ticket a la impresora
-    $ticket = "ID Usuario: $id_usuario\nFecha: $fecha\nMonto: $monto\n";
-    file_put_contents('ticket.txt', $ticket);
-    
-    // Enviar el archivo a la impresora en Windows (como ejemplo)
-    // shell_exec('notepad /p ticket.txt'); // Esto imprimirá el archivo con la impresora predeterminada de Windows
-}
-?>
-
-<!-- Formulario para ingresar las propinas -->
-<form action="index.php" method="POST">
-    <label for="id_usuario">ID Usuario:</label>
-    <input type="number" name="id_usuario" required><br>
-    
-    <label for="monto">Monto:</label>
-    <input type="number" name="monto" step="0.01" required><br>
-    
-    <button type="submit">Registrar Propina</button>
-</form>
-
-<!-- Mostrar las propinas registradas -->
-<?php
-if (count($propinas) > 0) {
-    echo "<h2>Propinas Registradas:</h2>";
-    echo "<table border='1'>";
-    echo "<tr><th>ID Usuario</th><th>Fecha</th><th>Monto</th></tr>";
-    foreach ($propinas as $propina) {
-        echo "<tr><td>" . $propina['id_usuario'] . "</td><td>" . $propina['fecha'] . "</td><td>" . $propina['monto'] . "</td></tr>";
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Control de Parqueo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f7f7;
+      margin: 0;
+      padding: 2rem;
     }
-    echo "</table>";
-} else {
-    echo "No hay propinas registradas.";
-}
-?>
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    h1 { text-align: center; }
+    input, button {
+      padding: 0.5rem;
+      margin: 0.5rem;
+      font-size: 1rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 0.5rem;
+      text-align: center;
+    }
+    .total {
+      font-weight: bold;
+      font-size: 1.2rem;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Control de Parqueo</h1>
+    <input type="text" id="placa" placeholder="Placa del vehículo" />
+    <input type="text" id="marca" placeholder="Marca del vehículo" />
+    <button onclick="registrarIngreso()">Ingresar</button>
+    <button onclick="cerrarTurno()">Cierre de Turno</button>
+
+    <table id="tablaRegistro">
+      <thead>
+        <tr>
+          <th>Placa</th>
+          <th>Marca</th>
+          <th>Hora Ingreso</th>
+          <th>Hora Salida</th>
+          <th>Total Q</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+      <tbody id="registro"></tbody>
+    </table>
+
+    <div class="total" id="totalTurno"></div>
+  </div>
+
+  <script>
+    const storageKey = 'parqueo_registro';
+    let datos = JSON.parse(localStorage.getItem(storageKey)) || [];
+
+    function registrarIngreso() {
+      const placa = document.getElementById('placa').value.trim();
+      const marca = document.getElementById('marca').value.trim();
+      if (!placa || !marca) return alert("Ingrese todos los datos");
+
+      const hora = new Date().toISOString();
+      datos.push({ placa, marca, horaIngreso: hora, horaSalida: null, total: null });
+      localStorage.setItem(storageKey, JSON.stringify(datos));
+      imprimirTicket(placa, marca, hora);
+      actualizarTabla();
+    }
+
+    function imprimirTicket(placa, marca, hora) {
+      const ventana = window.open('', '', 'width=300,height=400');
+      ventana.document.write(`<pre style="font-family:monospace;font-size:12pt">`);
+      ventana.document.write(`*** PARQUEO ***\n`);
+      ventana.document.write(`PLACA: ${placa}\n`);
+      ventana.document.write(`MARCA: ${marca}\n`);
+      ventana.document.write(`INGRESO: ${new Date(hora).toLocaleString()}\n`);
+      ventana.document.write(`\nGracias por su visita\n`);
+      ventana.document.write(`</pre>`);
+      ventana.print();
+      ventana.close();
+    }
+
+    function calcularPago(horaIngreso, horaSalida) {
+      const entrada = new Date(horaIngreso);
+      const salida = new Date(horaSalida);
+      const minutos = Math.ceil((salida - entrada) / 60000);
+      if (minutos <= 30) return 5;
+      const horas = Math.ceil(minutos / 60);
+      return horas * 10;
+    }
+
+    function sacarVehiculo(index) {
+      const salida = new Date().toISOString();
+      datos[index].horaSalida = salida;
+      datos[index].total = calcularPago(datos[index].horaIngreso, salida);
+      localStorage.setItem(storageKey, JSON.stringify(datos));
+      actualizarTabla();
+    }
+
+    function cerrarTurno() {
+      const ventana = window.open('', '', 'width=300,height=400');
+      const total = datos.reduce((sum, v) => sum + (v.total || 0), 0);
+      ventana.document.write(`<pre style="font-family:monospace;font-size:18pt;text-align:center">`);
+      ventana.document.write(`*** CIERRE DE TURNO ***\n\n`);
+      ventana.document.write(`TOTAL DEL TURNO: Q${total.toFixed(2)}\n`);
+      ventana.document.write(`\nGracias\n`);
+      ventana.document.write(`</pre>`);
+      ventana.print();
+      ventana.close();
+      localStorage.removeItem(storageKey);
+      datos = [];
+      actualizarTabla();
+    }
+
+    function actualizarTabla() {
+      const tabla = document.getElementById('registro');
+      tabla.innerHTML = '';
+      datos.forEach((d, i) => {
+        const fila = document.createElement('tr');
+        fila.innerHTML = `
+          <td>${d.placa}</td>
+          <td>${d.marca}</td>
+          <td>${new Date(d.horaIngreso).toLocaleString()}</td>
+          <td>${d.horaSalida ? new Date(d.horaSalida).toLocaleString() : '-'}</td>
+          <td>${d.total !== null ? 'Q' + d.total.toFixed(2) : '-'}</td>
+          <td>${d.horaSalida ? '' : '<button onclick="sacarVehiculo(' + i + ')">Salir</button>'}</td>
+        `;
+        tabla.appendChild(fila);
+      });
+
+      const total = datos.reduce((sum, v) => sum + (v.total || 0), 0);
+      document.getElementById('totalTurno').innerText = `Total actual: Q${total.toFixed(2)}`;
+    }
+
+    actualizarTabla();
+  </script>
+</body>
+</html>
