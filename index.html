@@ -7,7 +7,7 @@
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #e9f0f5;
+      background-color: #5c1d2c;
       margin: 0;
       padding: 2rem;
     }
@@ -47,7 +47,7 @@
       text-align: center;
     }
     th {
-      background-color: #2980b9;
+      background-color: #000000;
       color: white;
     }
     .total {
@@ -103,17 +103,20 @@
       const ventana = window.open('', '', 'width=300,height=400');
       ventana.document.write(`
         <html><head><style>
-        body { margin: 0; font-family: monospace; font-size: 16pt; }
-        pre { margin: 0; padding: 0; }
-        </style></head><body><pre>
-`);
-      ventana.document.write(`        MULTICARS\n`);
-      ventana.document.write(`\nPLACA: ${placa}\n`);
-      ventana.document.write(`MARCA: ${marca}\n`);
-      ventana.document.write(`INGRESO: ${new Date(hora).toLocaleString()}\n`);
-      ventana.document.write(`\nGracias por su visita\n`);
-      ventana.document.write(`\n*RECUERDE NO PERDER SU TICKET*\n`);
-      ventana.document.write(`</pre></body></html>`);
+        body { margin: 0; font-family: monospace; font-size: 18pt; text-align: center; }
+        img { max-width: 100px; margin-top: 10px; }
+        </style></head><body>
+        <img src="IMAGEN1.jpg" alt="Logo" />
+        <pre>
+MULTICARS
+
+PLACA: ${placa}
+MARCA: ${marca}
+INGRESO: ${new Date(hora).toLocaleString()}
+
+Gracias por su visita
+*RECUERDE NO PERDER SU TICKET*
+        </pre></body></html>`);
       ventana.document.close();
       ventana.print();
     }
@@ -131,8 +134,38 @@
       const salida = new Date().toISOString();
       datos[index].horaSalida = salida;
       datos[index].total = calcularPago(datos[index].horaIngreso, salida);
+      imprimirFactura(datos[index]);
       localStorage.setItem(storageKey, JSON.stringify(datos));
       actualizarTabla();
+    }
+
+    function imprimirFactura(dato) {
+      const ventana = window.open('', '', 'width=300,height=500');
+      const entrada = new Date(dato.horaIngreso);
+      const salida = new Date(dato.horaSalida);
+      const tiempo = Math.ceil((salida - entrada) / 60000);
+      ventana.document.write(`
+        <html><head><style>
+        body { margin: 0; font-family: monospace; font-size: 16pt; text-align: center; }
+        img { max-width: 100px; margin-top: 10px; }
+        </style></head><body>
+        <img src="IMAGEN1.jpg" alt="Logo" />
+        <pre>
+MULTICARS
+
+FACTURA VEHÍCULO
+
+PLACA: ${dato.placa}
+MARCA: ${dato.marca}
+ENTRADA: ${entrada.toLocaleString()}
+SALIDA : ${salida.toLocaleString()}
+TIEMPO : ${tiempo} min
+TOTAL  : Q${dato.total.toFixed(2)}
+
+Gracias por su visita
+        </pre></body></html>`);
+      ventana.document.close();
+      ventana.print();
     }
 
     function cerrarTurno() {
@@ -141,14 +174,18 @@
       ventana.document.write(`
         <html><head><style>
         body { margin: 0; font-family: monospace; font-size: 20pt; text-align: center; }
-        pre { margin: 0; padding: 0; }
-        </style></head><body><pre>
-`);
-      ventana.document.write(`    MULTICARS\n`);
-      ventana.document.write(`\n*** CIERRE DE TURNO ***\n\n`);
-      ventana.document.write(`TOTAL DEL TURNO: Q${total.toFixed(2)}\n`);
-      ventana.document.write(`\nGracias\n`);
-      ventana.document.write(`</pre></body></html>`);
+        img { max-width: 100px; margin-top: 10px; }
+        </style></head><body>
+        <img src="IMAGEN1.jpg" alt="Logo" />
+        <pre>
+MULTICARS
+
+*** CIERRE DE TURNO ***
+
+TOTAL DEL TURNO: Q${total.toFixed(2)}
+
+Gracias
+        </pre></body></html>`);
       ventana.document.close();
       ventana.print();
       localStorage.removeItem(storageKey);
