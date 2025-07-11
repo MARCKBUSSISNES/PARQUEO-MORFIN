@@ -6,24 +6,35 @@
   <title>Control de Parqueo</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f7f7f7;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #e9f0f5;
       margin: 0;
       padding: 2rem;
     }
     .container {
       max-width: 800px;
       margin: auto;
-      background: white;
+      background: #ffffff;
       padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     }
-    h1 { text-align: center; }
+    h1 { text-align: center; color: #2c3e50; }
     input, button {
-      padding: 0.5rem;
+      padding: 0.6rem;
       margin: 0.5rem;
       font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background-color: #2980b9;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #1c5980;
     }
     table {
       width: 100%;
@@ -31,14 +42,19 @@
       margin-top: 1rem;
     }
     th, td {
-      border: 1px solid #ddd;
+      border: 1px solid #ccc;
       padding: 0.5rem;
       text-align: center;
+    }
+    th {
+      background-color: #2980b9;
+      color: white;
     }
     .total {
       font-weight: bold;
       font-size: 1.2rem;
       margin-top: 1rem;
+      color: #2c3e50;
     }
   </style>
 </head>
@@ -85,15 +101,21 @@
 
     function imprimirTicket(placa, marca, hora) {
       const ventana = window.open('', '', 'width=300,height=400');
-      ventana.document.write(`<pre style="font-family:monospace;font-size:12pt">`);
-      ventana.document.write(`*** PARQUEO ***\n`);
-      ventana.document.write(`PLACA: ${placa}\n`);
+      ventana.document.write(`
+        <html><head><style>
+        body { margin: 0; font-family: monospace; font-size: 16pt; }
+        pre { margin: 0; padding: 0; }
+        </style></head><body><pre>
+`);
+      ventana.document.write(`        MULTICARS\n`);
+      ventana.document.write(`\nPLACA: ${placa}\n`);
       ventana.document.write(`MARCA: ${marca}\n`);
       ventana.document.write(`INGRESO: ${new Date(hora).toLocaleString()}\n`);
       ventana.document.write(`\nGracias por su visita\n`);
-      ventana.document.write(`</pre>`);
+      ventana.document.write(`\n*RECUERDE NO PERDER SU TICKET*\n`);
+      ventana.document.write(`</pre></body></html>`);
+      ventana.document.close();
       ventana.print();
-      ventana.close();
     }
 
     function calcularPago(horaIngreso, horaSalida) {
@@ -116,13 +138,19 @@
     function cerrarTurno() {
       const ventana = window.open('', '', 'width=300,height=400');
       const total = datos.reduce((sum, v) => sum + (v.total || 0), 0);
-      ventana.document.write(`<pre style="font-family:monospace;font-size:18pt;text-align:center">`);
-      ventana.document.write(`*** CIERRE DE TURNO ***\n\n`);
+      ventana.document.write(`
+        <html><head><style>
+        body { margin: 0; font-family: monospace; font-size: 20pt; text-align: center; }
+        pre { margin: 0; padding: 0; }
+        </style></head><body><pre>
+`);
+      ventana.document.write(`    MULTICARS\n`);
+      ventana.document.write(`\n*** CIERRE DE TURNO ***\n\n`);
       ventana.document.write(`TOTAL DEL TURNO: Q${total.toFixed(2)}\n`);
       ventana.document.write(`\nGracias\n`);
-      ventana.document.write(`</pre>`);
+      ventana.document.write(`</pre></body></html>`);
+      ventana.document.close();
       ventana.print();
-      ventana.close();
       localStorage.removeItem(storageKey);
       datos = [];
       actualizarTabla();
