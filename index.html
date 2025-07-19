@@ -13,24 +13,36 @@
       position: relative;
       min-height: 100vh;
     }
+    /* LOGIN STYLES */
     .login-bg {
       position: fixed;
       top: 0; left: 0;
       width: 100vw; height: 100vh;
-      background: #20597c;
       z-index: 9999;
       display: flex;
       align-items: center;
       justify-content: center;
+      /* Fondo con imagen */
+      background: url('FONDO 32') center center / cover no-repeat #20597c;
+      /* fallback color */
     }
     .login-box {
-      background: #4091bc;
+      background: #4091bcdd;
       border-radius: 8px;
       box-shadow: 0 8px 30px rgba(0,0,0,0.22);
       padding: 2.5rem 2.5rem 2rem 2.5rem;
       text-align: center;
       min-width: 330px;
       max-width: 95vw;
+      position: relative;
+    }
+    .login-logo {
+      width: 88px;
+      height: 88px;
+      object-fit: contain;
+      margin-bottom: 0.8rem;
+      margin-top: -0.5rem;
+      filter: drop-shadow(0 2px 8px #4444cc77);
     }
     .login-box h2 {
       margin: 0 0 2rem 0;
@@ -38,6 +50,7 @@
       font-size: 2rem;
       font-weight: 500;
       letter-spacing: 1px;
+      text-shadow: 0 2px 6px #00335560;
     }
     .login-box input {
       width: 95%;
@@ -45,15 +58,23 @@
       border-radius: 5px;
       border: none;
       margin-bottom: 1rem;
-      background: #e5edf0;
+      background: #181818;
       font-size: 1rem;
-      color: #20597c;
+      color: #f3f6ff;
       outline: none;
       transition: 0.2s;
+      box-shadow: 0 0 0 1.5px #333 inset;
+      opacity: 0.95;
+    }
+    .login-box input::placeholder {
+      color: #b8b8b8;
+      opacity: 0.8;
+      font-weight: 400;
     }
     .login-box input:focus {
-      box-shadow: 0 0 0 2px #ffffff80;
-      background: #fff;
+      box-shadow: 0 0 0 2.5px #5eb2ff;
+      background: #232323;
+      color: #fff;
     }
     .login-box button {
       width: 100%;
@@ -90,6 +111,16 @@
       text-align: center;
       text-decoration: underline;
       cursor: pointer;
+    }
+    .firma-marck {
+      margin-top: 1.4rem;
+      color: #fff;
+      font-size: 1.07rem;
+      opacity: 0.85;
+      letter-spacing: 1.2px;
+      text-align: center;
+      font-weight: 500;
+      text-shadow: 0 2px 4px #002b3d50;
     }
     /* Lo demás de tu app */
     .encabezado-global {
@@ -182,6 +213,7 @@
 <!-- Pantalla LOGIN -->
 <div id="login-bg" class="login-bg">
   <form class="login-box" id="loginForm" autocomplete="off" onsubmit="return false;">
+    <img src="LOGO1" alt="Logo" class="login-logo" />
     <h2>Bienvenido</h2>
     <input id="usuario" type="text" placeholder="Usuario" autocomplete="off" autofocus />
     <input id="clave" type="password" placeholder="Contraseña" autocomplete="off" />
@@ -191,6 +223,7 @@
       ¿No tienes Cuenta? <a onclick="alert('Acceso solo para personal autorizado')">Regístrate</a>
     </div>
     <span class="volver-link" onclick="location.reload()">Volver</span>
+    <div class="firma-marck">Marck Business</div>
   </form>
 </div>
 
