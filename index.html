@@ -98,6 +98,7 @@
   </style>
 </head>
 <body>
+<div id="contenido" style="display:none;">
   <div class="encabezado-global">
     <img src="IMAGEN1.jpg" alt="Logo" />
   </div>
@@ -132,6 +133,7 @@
       <img src="https://img.icons8.com/color/96/000000/whatsapp.png" alt="WhatsApp" />
     </a>
   </div>
+</div>
 
   <script>
     const storageKey = 'parqueo_registro';
@@ -469,6 +471,36 @@ Gracias
     }
 
     actualizarTabla();
+  </script>
+
+  <!-- LOGIN DE ACCESO (debe estar después del script principal) -->
+  <script>
+    // Proteccion doble clave: Usuario (MORFIN), Clave (12345)
+    function pedirClaves() {
+      let usuario = prompt("Ingrese el usuario:");
+      if (usuario === null) {
+        document.body.innerHTML = "<h2>Acceso cancelado.</h2>";
+        return;
+      }
+      if (usuario !== "MORFIN") {
+        alert("Usuario incorrecto. Intente de nuevo.");
+        pedirClaves();
+        return;
+      }
+      let clave = prompt("Ingrese la clave:");
+      if (clave === null) {
+        document.body.innerHTML = "<h2>Acceso cancelado.</h2>";
+        return;
+      }
+      if (clave !== "12345") {
+        alert("Clave incorrecta. Intente de nuevo.");
+        pedirClaves();
+        return;
+      }
+      document.getElementById("contenido").style.display = "block";
+    }
+
+    window.onload = pedirClaves;
   </script>
 </body>
 </html>
