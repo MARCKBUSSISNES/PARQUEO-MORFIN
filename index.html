@@ -7,11 +7,91 @@
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #b30000;
+      background-color: #20597c;
       margin: 0;
       padding: 2rem;
       position: relative;
+      min-height: 100vh;
     }
+    .login-bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: #20597c;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .login-box {
+      background: #4091bc;
+      border-radius: 8px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.22);
+      padding: 2.5rem 2.5rem 2rem 2.5rem;
+      text-align: center;
+      min-width: 330px;
+      max-width: 95vw;
+    }
+    .login-box h2 {
+      margin: 0 0 2rem 0;
+      color: #e7f7ff;
+      font-size: 2rem;
+      font-weight: 500;
+      letter-spacing: 1px;
+    }
+    .login-box input {
+      width: 95%;
+      padding: 0.9rem;
+      border-radius: 5px;
+      border: none;
+      margin-bottom: 1rem;
+      background: #e5edf0;
+      font-size: 1rem;
+      color: #20597c;
+      outline: none;
+      transition: 0.2s;
+    }
+    .login-box input:focus {
+      box-shadow: 0 0 0 2px #ffffff80;
+      background: #fff;
+    }
+    .login-box button {
+      width: 100%;
+      background: #bfe3fa;
+      border: none;
+      color: #20597c;
+      font-size: 1.15rem;
+      padding: 0.8rem 0;
+      border-radius: 4px;
+      margin-bottom: 1.1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-weight: bold;
+    }
+    .login-box button:hover {
+      background: #8fd2fa;
+    }
+    .login-links {
+      font-size: 0.97rem;
+      color: #e7f7ff;
+      opacity: 0.90;
+    }
+    .login-links a {
+      color: #f8f8ff;
+      text-decoration: underline;
+      cursor: pointer;
+      margin-left: 2px;
+    }
+    .volver-link {
+      display: block;
+      margin-top: 1.5rem;
+      color: #e7f7ff;
+      font-size: 0.99rem;
+      text-align: center;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    /* Lo demás de tu app */
     .encabezado-global {
       text-align: center;
       margin-bottom: 1.5rem;
@@ -19,7 +99,7 @@
     .encabezado-global img {
       max-width: 100%;
       height: auto;
-      max-height: 200px; /* MÁS GRANDE */
+      max-height: 200px;
     }
     .container {
       max-width: 800px;
@@ -95,21 +175,36 @@
     .whatsapp img {
       width: 60px;
     }
+    #contenido { display: none; }
   </style>
 </head>
 <body>
-<div id="contenido" style="display:none;">
+<!-- Pantalla LOGIN -->
+<div id="login-bg" class="login-bg">
+  <form class="login-box" id="loginForm" autocomplete="off" onsubmit="return false;">
+    <h2>Bienvenido</h2>
+    <input id="usuario" type="text" placeholder="Usuario" autocomplete="off" autofocus />
+    <input id="clave" type="password" placeholder="Contraseña" autocomplete="off" />
+    <button onclick="loginSistema()">Login</button>
+    <div class="login-links">
+      ¿Perdiste tu contraseña? <a onclick="alert('Contacta a tu administrador')">Recupérala</a><br>
+      ¿No tienes Cuenta? <a onclick="alert('Acceso solo para personal autorizado')">Regístrate</a>
+    </div>
+    <span class="volver-link" onclick="location.reload()">Volver</span>
+  </form>
+</div>
+
+<!-- SISTEMA DE PARQUEO -->
+<div id="contenido">
   <div class="encabezado-global">
     <img src="IMAGEN1.jpg" alt="Logo" />
   </div>
-
   <div class="container">
     <h1>Control de Parqueo</h1>
     <input type="text" id="placa" placeholder="Placa del vehículo" />
     <input type="text" id="marca" placeholder="Marca del vehículo" />
     <button onclick="registrarIngreso()">Ingresar</button>
     <button onclick="cerrarTurno()">Cierre de Turno</button>
-
     <table id="tablaRegistro">
       <thead>
         <tr>
@@ -123,10 +218,8 @@
       </thead>
       <tbody id="registro"></tbody>
     </table>
-
     <div class="total" id="totalTurno"></div>
   </div>
-
   <div class="footer">&copy; MarckBusiness 2025 - Todos los derechos reservados</div>
   <div class="whatsapp">
     <a href="https://wa.me/50258140621" target="_blank">
@@ -135,326 +228,348 @@
   </div>
 </div>
 
-  <script>
-    const storageKey = 'parqueo_registro';
-    let datos = JSON.parse(localStorage.getItem(storageKey)) || [];
-
-    function registrarIngreso() {
-      const placaInput = document.getElementById('placa');
-      const marcaInput = document.getElementById('marca');
-      const placa = placaInput.value.trim();
-      const marca = marcaInput.value.trim();
-      if (!placa || !marca) return alert("Ingrese todos los datos");
-
-      const hora = new Date().toISOString();
-      datos.push({ placa, marca, horaIngreso: hora, horaSalida: null, total: null });
-      localStorage.setItem(storageKey, JSON.stringify(datos));
-      imprimirTicket(placa, marca, hora);
-      placaInput.value = "";
-      marcaInput.value = "";
-      actualizarTabla();
+<script>
+  // -------- LOGIN VISUAL ----------
+  function loginSistema() {
+    var usuario = document.getElementById('usuario').value.trim();
+    var clave = document.getElementById('clave').value.trim();
+    if (usuario.toUpperCase() === 'MORFIN' && clave === '12345') {
+      document.getElementById('login-bg').style.display = 'none';
+      document.getElementById('contenido').style.display = 'block';
+      document.getElementById('usuario').value = '';
+      document.getElementById('clave').value = '';
+      setTimeout(() => { // Foco automático al primer campo al entrar
+        var input = document.getElementById('placa');
+        if(input) input.focus();
+      }, 200);
+      return false;
+    } else {
+      alert('Usuario o contraseña incorrectos');
+      document.getElementById('clave').value = '';
+      document.getElementById('usuario').focus();
+      return false;
     }
+  }
+  // Permitir enter para login
+  document.getElementById('loginForm').addEventListener('submit', loginSistema);
+  document.getElementById('clave').addEventListener('keyup', function(e){
+    if(e.key === 'Enter') loginSistema();
+  });
 
-    function imprimirTicket(placa, marca, hora) {
-      const fecha = new Date(hora);
-      const fechaStr = fecha.toLocaleDateString();
-      const horaStr = fecha.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  // -------- SISTEMA DE PARQUEO (NO TOCAR NADA AQUÍ) ----------
+  const storageKey = 'parqueo_registro';
+  let datos = JSON.parse(localStorage.getItem(storageKey)) || [];
 
-      const barcodeURL = `https://barcode.tec-it.com/barcode.ashx?data=${encodeURIComponent(placa)}&code=Code128&translate-esc=false`;
+  function registrarIngreso() {
+    const placaInput = document.getElementById('placa');
+    const marcaInput = document.getElementById('marca');
+    const placa = placaInput.value.trim();
+    const marca = marcaInput.value.trim();
+    if (!placa || !marca) return alert("Ingrese todos los datos");
 
-      const ventana = window.open('', '', 'width=300,height=600');
-      ventana.document.write(`
-        <html><head><style>
-          body {
-            margin: 0;
-            font-family: monospace;
-            font-size: 14pt;
-            text-align: center;
-            padding: 10px;
-          }
-          img.logo {
-            width: 100%;
-            max-width: 260px;
-            margin-bottom: 10px;
-          }
-          .grande {
-            font-size: 18pt;
-            font-weight: bold;
-          }
-          .linea {
-            margin: 10px 0;
-            border-top: 1px dashed #000;
-          }
-          .barra {
-            margin-top: 20px;
-          }
-        </style></head><body>
-          <img src="IMAGEN1.jpg" class="logo" alt="Logo" />
-          <div class="linea"></div>
-          <div>FECHA</div>
-          <div>${fechaStr}</div>
-          <div class="linea"></div>
-          <div>HORA DE INGRESO</div>
-          <div class="grande">${horaStr}</div>
-          <div class="linea"></div>
-          <div>PLACA</div>
-          <div class="grande">${placa}</div>
-          <div class="linea"></div>
-          <div>MARCA DEL VEHÍCULO</div>
-          <div class="grande">${marca}</div>
-          <div class="linea"></div>
-          <div class="barra">
-            <img src="${barcodeURL}" alt="Código de Barras" />
-          </div>
-          <div class="linea"></div>
-          <pre>
+    const hora = new Date().toISOString();
+    datos.push({ placa, marca, horaIngreso: hora, horaSalida: null, total: null });
+    localStorage.setItem(storageKey, JSON.stringify(datos));
+    imprimirTicket(placa, marca, hora);
+    placaInput.value = "";
+    marcaInput.value = "";
+    actualizarTabla();
+  }
+
+  function imprimirTicket(placa, marca, hora) {
+    const fecha = new Date(hora);
+    const fechaStr = fecha.toLocaleDateString();
+    const horaStr = fecha.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    const barcodeURL = `https://barcode.tec-it.com/barcode.ashx?data=${encodeURIComponent(placa)}&code=Code128&translate-esc=false`;
+
+    const ventana = window.open('', '', 'width=300,height=600');
+    ventana.document.write(`
+      <html><head><style>
+        body {
+          margin: 0;
+          font-family: monospace;
+          font-size: 14pt;
+          text-align: center;
+          padding: 10px;
+        }
+        img.logo {
+          width: 100%;
+          max-width: 260px;
+          margin-bottom: 10px;
+        }
+        .grande {
+          font-size: 18pt;
+          font-weight: bold;
+        }
+        .linea {
+          margin: 10px 0;
+          border-top: 1px dashed #000;
+        }
+        .barra {
+          margin-top: 20px;
+        }
+      </style></head><body>
+        <img src="IMAGEN1.jpg" class="logo" alt="Logo" />
+        <div class="linea"></div>
+        <div>FECHA</div>
+        <div>${fechaStr}</div>
+        <div class="linea"></div>
+        <div>HORA DE INGRESO</div>
+        <div class="grande">${horaStr}</div>
+        <div class="linea"></div>
+        <div>PLACA</div>
+        <div class="grande">${placa}</div>
+        <div class="linea"></div>
+        <div>MARCA DEL VEHÍCULO</div>
+        <div class="grande">${marca}</div>
+        <div class="linea"></div>
+        <div class="barra">
+          <img src="${barcodeURL}" alt="Código de Barras" />
+        </div>
+        <div class="linea"></div>
+        <pre>
 Gracias por su visita
 *RECUERDE NO PERDER SU TICKET*
-          </pre>
-        </body></html>
-      `);
-      ventana.document.close();
-      ventana.print();
-    }
+        </pre>
+      </body></html>
+    `);
+    ventana.document.close();
+    ventana.print();
+  }
 
-    function calcularPago(horaIngreso, horaSalida) {
-      const entrada = new Date(horaIngreso);
-      const salida = new Date(horaSalida);
-      const minutos = Math.ceil((salida - entrada) / 60000);
+  function calcularPago(horaIngreso, horaSalida) {
+    const entrada = new Date(horaIngreso);
+    const salida = new Date(horaSalida);
+    const minutos = Math.ceil((salida - entrada) / 60000);
 
-      const tarifas = [
-        { min: 0, max: 5, precio: 0 },
-        { min: 6, max: 35, precio: 5 },
-        { min: 36, max: 65, precio: 8 },
-        { min: 66, max: 95, precio: 13 },
-        { min: 96, max: 125, precio: 16 },
-        { min: 126, max: 155, precio: 21 },
-        { min: 156, max: 185, precio: 24 },
-        { min: 186, max: 215, precio: 29 },
-        { min: 216, max: 245, precio: 32 },
-        { min: 246, max: 275, precio: 37 },
-        { min: 276, max: 305, precio: 40 },
-        { min: 306, max: 335, precio: 45 },
-        { min: 336, max: 365, precio: 48 },
-        { min: 366, max: 395, precio: 53 },
-        { min: 396, max: 425, precio: 56 },
-        { min: 426, max: 455, precio: 61 },
-        { min: 456, max: 485, precio: 64 },
-        { min: 486, max: 515, precio: 69 },
-        { min: 516, max: 545, precio: 72 },
-        { min: 546, max: 575, precio: 77 },
-        { min: 576, max: 605, precio: 80 },
-        { min: 606, max: 635, precio: 85 },
-        { min: 636, max: 665, precio: 88 }
-      ];
+    const tarifas = [
+      { min: 0, max: 5, precio: 0 },
+      { min: 6, max: 35, precio: 5 },
+      { min: 36, max: 65, precio: 8 },
+      { min: 66, max: 95, precio: 13 },
+      { min: 96, max: 125, precio: 16 },
+      { min: 126, max: 155, precio: 21 },
+      { min: 156, max: 185, precio: 24 },
+      { min: 186, max: 215, precio: 29 },
+      { min: 216, max: 245, precio: 32 },
+      { min: 246, max: 275, precio: 37 },
+      { min: 276, max: 305, precio: 40 },
+      { min: 306, max: 335, precio: 45 },
+      { min: 336, max: 365, precio: 48 },
+      { min: 366, max: 395, precio: 53 },
+      { min: 396, max: 425, precio: 56 },
+      { min: 426, max: 455, precio: 61 },
+      { min: 456, max: 485, precio: 64 },
+      { min: 486, max: 515, precio: 69 },
+      { min: 516, max: 545, precio: 72 },
+      { min: 546, max: 575, precio: 77 },
+      { min: 576, max: 605, precio: 80 },
+      { min: 606, max: 635, precio: 85 },
+      { min: 636, max: 665, precio: 88 }
+    ];
 
-      for (let i = 0; i < tarifas.length; i++) {
-        if (minutos >= tarifas[i].min && minutos <= tarifas[i].max) {
-          return tarifas[i].precio;
-        }
+    for (let i = 0; i < tarifas.length; i++) {
+      if (minutos >= tarifas[i].min && minutos <= tarifas[i].max) {
+        return tarifas[i].precio;
       }
-
-      return 88;
     }
+    return 88;
+  }
 
-    function sacarVehiculo(index) {
-      const salida = new Date().toISOString();
-      datos[index].horaSalida = salida;
-      datos[index].total = calcularPago(datos[index].horaIngreso, salida);
-      imprimirFactura(datos[index]);
-      localStorage.setItem(storageKey, JSON.stringify(datos));
-      actualizarTabla();
-    }
+  function sacarVehiculo(index) {
+    const salida = new Date().toISOString();
+    datos[index].horaSalida = salida;
+    datos[index].total = calcularPago(datos[index].horaIngreso, salida);
+    imprimirFactura(datos[index]);
+    localStorage.setItem(storageKey, JSON.stringify(datos));
+    actualizarTabla();
+  }
 
-    function imprimirFactura(dato) {
-      const entrada = new Date(dato.horaIngreso);
-      const salida = new Date(dato.horaSalida);
-      const tiempo = Math.ceil((salida - entrada) / 60000);
-      const barcodeURL = `https://barcode.tec-it.com/barcode.ashx?data=${encodeURIComponent(dato.placa)}&code=Code128&translate-esc=false`;
+  function imprimirFactura(dato) {
+    const entrada = new Date(dato.horaIngreso);
+    const salida = new Date(dato.horaSalida);
+    const tiempo = Math.ceil((salida - entrada) / 60000);
+    const barcodeURL = `https://barcode.tec-it.com/barcode.ashx?data=${encodeURIComponent(dato.placa)}&code=Code128&translate-esc=false`;
 
-      const ventana = window.open('', '', 'width=300,height=650');
-      ventana.document.write(`
-        <html><head><style>
-          body {
-            margin: 0;
-            font-family: monospace;
-            font-size: 14pt;
-            text-align: center;
-            padding: 10px;
-          }
-          img.logo {
-            width: 100%;
-            max-width: 260px;
-            margin-bottom: 10px;
-          }
-          .grande {
-            font-size: 18pt;
-            font-weight: bold;
-          }
-          .linea {
-            margin: 10px 0;
-            border-top: 1px dashed #000;
-          }
-          .barra {
-            margin-top: 20px;
-          }
-        </style></head><body>
-          <img src="IMAGEN1.jpg" class="logo" alt="Logo" />
-          <div class="linea"></div>
-          <div>FACTURA VEHÍCULO</div>
-          <div class="linea"></div>
-          <div>PLACA</div>
-          <div class="grande">${dato.placa}</div>
-          <div class="linea"></div>
-          <div>MARCA</div>
-          <div class="grande">${dato.marca}</div>
-          <div class="linea"></div>
-          <div>ENTRADA</div>
-          <div>${entrada.toLocaleString()}</div>
-          <div class="linea"></div>
-          <div>SALIDA</div>
-          <div>${salida.toLocaleString()}</div>
-          <div class="linea"></div>
-          <div>TIEMPO TOTAL</div>
-          <div class="grande">${tiempo} minutos</div>
-          <div class="linea"></div>
-          <div>TOTAL A PAGAR</div>
-          <div class="grande">Q${dato.total.toFixed(2)}</div>
-          <div class="linea"></div>
-          <div class="barra">
-            <img src="${barcodeURL}" alt="Código de Barras" />
-          </div>
-          <div class="linea"></div>
-          <pre>
+    const ventana = window.open('', '', 'width=300,height=650');
+    ventana.document.write(`
+      <html><head><style>
+        body {
+          margin: 0;
+          font-family: monospace;
+          font-size: 14pt;
+          text-align: center;
+          padding: 10px;
+        }
+        img.logo {
+          width: 100%;
+          max-width: 260px;
+          margin-bottom: 10px;
+        }
+        .grande {
+          font-size: 18pt;
+          font-weight: bold;
+        }
+        .linea {
+          margin: 10px 0;
+          border-top: 1px dashed #000;
+        }
+        .barra {
+          margin-top: 20px;
+        }
+      </style></head><body>
+        <img src="IMAGEN1.jpg" class="logo" alt="Logo" />
+        <div class="linea"></div>
+        <div>FACTURA VEHÍCULO</div>
+        <div class="linea"></div>
+        <div>PLACA</div>
+        <div class="grande">${dato.placa}</div>
+        <div class="linea"></div>
+        <div>MARCA</div>
+        <div class="grande">${dato.marca}</div>
+        <div class="linea"></div>
+        <div>ENTRADA</div>
+        <div>${entrada.toLocaleString()}</div>
+        <div class="linea"></div>
+        <div>SALIDA</div>
+        <div>${salida.toLocaleString()}</div>
+        <div class="linea"></div>
+        <div>TIEMPO TOTAL</div>
+        <div class="grande">${tiempo} minutos</div>
+        <div class="linea"></div>
+        <div>TOTAL A PAGAR</div>
+        <div class="grande">Q${dato.total.toFixed(2)}</div>
+        <div class="linea"></div>
+        <div class="barra">
+          <img src="${barcodeURL}" alt="Código de Barras" />
+        </div>
+        <div class="linea"></div>
+        <pre>
 Gracias por su visita
-          </pre>
-        </body></html>
-      `);
-      ventana.document.close();
-      ventana.print();
-    }
+        </pre>
+      </body></html>
+    `);
+    ventana.document.close();
+    ventana.print();
+  }
 
-    // ------------------- MODIFICACIÓN GYM -------------------
+  // ------------------- MODIFICACIÓN GYM -------------------
+  function actualizarTabla() {
+    const tabla = document.getElementById('registro');
+    tabla.innerHTML = '';
+    datos.forEach((d, i) => {
+      const fila = document.createElement('tr');
+      fila.innerHTML = `
+        <td>${d.placa}</td>
+        <td>${d.marca}</td>
+        <td>${new Date(d.horaIngreso).toLocaleString()}</td>
+        <td>${d.horaSalida ? new Date(d.horaSalida).toLocaleString() : '-'}</td>
+        <td>${d.total !== null ? 'Q' + d.total.toFixed(2) : '-'}</td>
+        <td>
+          ${d.horaSalida ? '' : `
+            <button onclick="sacarVehiculo(${i})">Salir</button>
+            <button style="background:#FFD600;color:#222;font-size:1.1em; margin-left:4px;" onclick="marcarGYM(${i})">
+              <span style="font-size:1.3em;vertical-align:middle;">💪</span> GYM
+            </button>
+          `}
+        </td>
+      `;
+      tabla.appendChild(fila);
+    });
 
-    function actualizarTabla() {
-      const tabla = document.getElementById('registro');
-      tabla.innerHTML = '';
-      datos.forEach((d, i) => {
-        const fila = document.createElement('tr');
-        fila.innerHTML = `
-          <td>${d.placa}</td>
-          <td>${d.marca}</td>
-          <td>${new Date(d.horaIngreso).toLocaleString()}</td>
-          <td>${d.horaSalida ? new Date(d.horaSalida).toLocaleString() : '-'}</td>
-          <td>${d.total !== null ? 'Q' + d.total.toFixed(2) : '-'}</td>
-          <td>
-            ${d.horaSalida ? '' : `
-              <button onclick="sacarVehiculo(${i})">Salir</button>
-              <button style="background:#FFD600;color:#222;font-size:1.1em; margin-left:4px;" onclick="marcarGYM(${i})">
-                <span style="font-size:1.3em;vertical-align:middle;">💪</span> GYM
-              </button>
-            `}
-          </td>
-        `;
-        tabla.appendChild(fila);
-      });
+    const total = datos.reduce((sum, v) => sum + (v.total || 0), 0);
+    document.getElementById('totalTurno').innerText = `Total actual: Q${total.toFixed(2)}`;
+  }
 
-      const total = datos.reduce((sum, v) => sum + (v.total || 0), 0);
-      document.getElementById('totalTurno').innerText = `Total actual: Q${total.toFixed(2)}`;
-    }
+  function marcarGYM(index) {
+    const salida = new Date().toISOString();
+    datos[index].horaSalida = salida;
+    datos[index].total = 0; // Q0.00 siempre
+    imprimirFacturaGYM(datos[index]);
+    localStorage.setItem(storageKey, JSON.stringify(datos));
+    actualizarTabla();
+  }
+  function imprimirFacturaGYM(dato) {
+    const entrada = new Date(dato.horaIngreso);
+    const salida = new Date(dato.horaSalida);
+    const tiempo = Math.ceil((salida - entrada) / 60000);
+    const barcodeURL = `https://barcode.tec-it.com/barcode.ashx?data=${encodeURIComponent(dato.placa)}&code=Code128&translate-esc=false`;
 
-    // FUNCIÓN PARA MARCAR COMO GYM (Q0.00)
-    function marcarGYM(index) {
-      const salida = new Date().toISOString();
-      datos[index].horaSalida = salida;
-      datos[index].total = 0; // Q0.00 siempre
-      imprimirFacturaGYM(datos[index]);
-      localStorage.setItem(storageKey, JSON.stringify(datos));
-      actualizarTabla();
-    }
-
-    // Imprimir factura especial GYM
-    function imprimirFacturaGYM(dato) {
-      const entrada = new Date(dato.horaIngreso);
-      const salida = new Date(dato.horaSalida);
-      const tiempo = Math.ceil((salida - entrada) / 60000);
-      const barcodeURL = `https://barcode.tec-it.com/barcode.ashx?data=${encodeURIComponent(dato.placa)}&code=Code128&translate-esc=false`;
-
-      const ventana = window.open('', '', 'width=300,height=650');
-      ventana.document.write(`
-        <html><head><style>
-          body {
-            margin: 0;
-            font-family: monospace;
-            font-size: 14pt;
-            text-align: center;
-            padding: 10px;
-          }
-          img.logo {
-            width: 100%;
-            max-width: 260px;
-            margin-bottom: 10px;
-          }
-          .grande {
-            font-size: 18pt;
-            font-weight: bold;
-          }
-          .linea {
-            margin: 10px 0;
-            border-top: 1px dashed #000;
-          }
-          .barra {
-            margin-top: 20px;
-          }
-        </style></head><body>
-          <img src="IMAGEN1.jpg" class="logo" alt="Logo" />
-          <div class="linea"></div>
-          <div>FACTURA VEHÍCULO GYM <span style="font-size:1.2em;">💪</span></div>
-          <div class="linea"></div>
-          <div>PLACA</div>
-          <div class="grande">${dato.placa}</div>
-          <div class="linea"></div>
-          <div>MARCA</div>
-          <div class="grande">${dato.marca}</div>
-          <div class="linea"></div>
-          <div>ENTRADA</div>
-          <div>${entrada.toLocaleString()}</div>
-          <div class="linea"></div>
-          <div>SALIDA</div>
-          <div>${salida.toLocaleString()}</div>
-          <div class="linea"></div>
-          <div>TIEMPO TOTAL</div>
-          <div class="grande">${tiempo} minutos</div>
-          <div class="linea"></div>
-          <div>TOTAL A PAGAR</div>
-          <div class="grande" style="color:#388e3c;">Q0.00</div>
-          <div class="linea"></div>
-          <div class="barra">
-            <img src="${barcodeURL}" alt="Código de Barras" />
-          </div>
-          <div class="linea"></div>
-          <pre>
+    const ventana = window.open('', '', 'width=300,height=650');
+    ventana.document.write(`
+      <html><head><style>
+        body {
+          margin: 0;
+          font-family: monospace;
+          font-size: 14pt;
+          text-align: center;
+          padding: 10px;
+        }
+        img.logo {
+          width: 100%;
+          max-width: 260px;
+          margin-bottom: 10px;
+        }
+        .grande {
+          font-size: 18pt;
+          font-weight: bold;
+        }
+        .linea {
+          margin: 10px 0;
+          border-top: 1px dashed #000;
+        }
+        .barra {
+          margin-top: 20px;
+        }
+      </style></head><body>
+        <img src="IMAGEN1.jpg" class="logo" alt="Logo" />
+        <div class="linea"></div>
+        <div>FACTURA VEHÍCULO GYM <span style="font-size:1.2em;">💪</span></div>
+        <div class="linea"></div>
+        <div>PLACA</div>
+        <div class="grande">${dato.placa}</div>
+        <div class="linea"></div>
+        <div>MARCA</div>
+        <div class="grande">${dato.marca}</div>
+        <div class="linea"></div>
+        <div>ENTRADA</div>
+        <div>${entrada.toLocaleString()}</div>
+        <div class="linea"></div>
+        <div>SALIDA</div>
+        <div>${salida.toLocaleString()}</div>
+        <div class="linea"></div>
+        <div>TIEMPO TOTAL</div>
+        <div class="grande">${tiempo} minutos</div>
+        <div class="linea"></div>
+        <div>TOTAL A PAGAR</div>
+        <div class="grande" style="color:#388e3c;">Q0.00</div>
+        <div class="linea"></div>
+        <div class="barra">
+          <img src="${barcodeURL}" alt="Código de Barras" />
+        </div>
+        <div class="linea"></div>
+        <pre>
 Gracias por su visita
 PARQUEO PARA GYM
-          </pre>
-        </body></html>
-      `);
-      ventana.document.close();
-      ventana.print();
-    }
+        </pre>
+      </body></html>
+    `);
+    ventana.document.close();
+    ventana.print();
+  }
+  // ------------------- FIN MODIFICACIÓN GYM -------------------
 
-    // ------------------- FIN MODIFICACIÓN GYM -------------------
-
-    function cerrarTurno() {
-      const ventana = window.open('', '', 'width=300,height=400');
-      const total = datos.reduce((sum, v) => sum + (v.total || 0), 0);
-      ventana.document.write(`
-        <html><head><style>
-        body { margin: 0; font-family: monospace; font-size: 20pt; text-align: center; }
-        img { max-width: 100px; margin-top: 10px; }
-        </style></head><body>
-        <img src="IMAGEN1.jpg" alt="Logo" />
-        <pre>
+  function cerrarTurno() {
+    const ventana = window.open('', '', 'width=300,height=400');
+    const total = datos.reduce((sum, v) => sum + (v.total || 0), 0);
+    ventana.document.write(`
+      <html><head><style>
+      body { margin: 0; font-family: monospace; font-size: 20pt; text-align: center; }
+      img { max-width: 100px; margin-top: 10px; }
+      </style></head><body>
+      <img src="IMAGEN1.jpg" alt="Logo" />
+      <pre>
 MULTICARS
 
 *** CIERRE DE TURNO ***
@@ -462,46 +577,14 @@ MULTICARS
 TOTAL DEL TURNO: Q${total.toFixed(2)}
 
 Gracias
-        </pre></body></html>`);
-      ventana.document.close();
-      ventana.print();
-      localStorage.removeItem(storageKey);
-      datos = [];
-      actualizarTabla();
-    }
-
+      </pre></body></html>`);
+    ventana.document.close();
+    ventana.print();
+    localStorage.removeItem(storageKey);
+    datos = [];
     actualizarTabla();
-  </script>
-
-  <!-- LOGIN DE ACCESO (debe estar después del script principal) -->
-  <script>
-    // Proteccion doble clave: Usuario (MORFIN), Clave (12345)
-    function pedirClaves() {
-      let usuario = prompt("Ingrese el usuario:");
-      if (usuario === null) {
-        document.body.innerHTML = "<h2>Acceso cancelado.</h2>";
-        return;
-      }
-      if (usuario !== "MORFIN") {
-        alert("Usuario incorrecto. Intente de nuevo.");
-        pedirClaves();
-        return;
-      }
-      let clave = prompt("Ingrese la clave:");
-      if (clave === null) {
-        document.body.innerHTML = "<h2>Acceso cancelado.</h2>";
-        return;
-      }
-      if (clave !== "12345") {
-        alert("Clave incorrecta. Intente de nuevo.");
-        pedirClaves();
-        return;
-      }
-      document.getElementById("contenido").style.display = "block";
-    }
-
-    window.onload = pedirClaves;
-  </script>
+  }
+  actualizarTabla();
+</script>
 </body>
 </html>
-
