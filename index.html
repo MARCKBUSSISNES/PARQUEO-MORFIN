@@ -19,7 +19,7 @@
     .encabezado-global img {
       max-width: 100%;
       height: auto;
-      max-height: 100px;
+      max-height: 200px; /* MÁS GRANDE */
     }
     .container {
       max-width: 800px;
@@ -332,6 +332,117 @@ Gracias por su visita
       ventana.print();
     }
 
+    // ------------------- MODIFICACIÓN GYM -------------------
+
+    function actualizarTabla() {
+      const tabla = document.getElementById('registro');
+      tabla.innerHTML = '';
+      datos.forEach((d, i) => {
+        const fila = document.createElement('tr');
+        fila.innerHTML = `
+          <td>${d.placa}</td>
+          <td>${d.marca}</td>
+          <td>${new Date(d.horaIngreso).toLocaleString()}</td>
+          <td>${d.horaSalida ? new Date(d.horaSalida).toLocaleString() : '-'}</td>
+          <td>${d.total !== null ? 'Q' + d.total.toFixed(2) : '-'}</td>
+          <td>
+            ${d.horaSalida ? '' : `
+              <button onclick="sacarVehiculo(${i})">Salir</button>
+              <button style="background:#FFD600;color:#222;font-size:1.1em; margin-left:4px;" onclick="marcarGYM(${i})">
+                <span style="font-size:1.3em;vertical-align:middle;">💪</span> GYM
+              </button>
+            `}
+          </td>
+        `;
+        tabla.appendChild(fila);
+      });
+
+      const total = datos.reduce((sum, v) => sum + (v.total || 0), 0);
+      document.getElementById('totalTurno').innerText = `Total actual: Q${total.toFixed(2)}`;
+    }
+
+    // FUNCIÓN PARA MARCAR COMO GYM (Q0.00)
+    function marcarGYM(index) {
+      const salida = new Date().toISOString();
+      datos[index].horaSalida = salida;
+      datos[index].total = 0; // Q0.00 siempre
+      imprimirFacturaGYM(datos[index]);
+      localStorage.setItem(storageKey, JSON.stringify(datos));
+      actualizarTabla();
+    }
+
+    // Imprimir factura especial GYM
+    function imprimirFacturaGYM(dato) {
+      const entrada = new Date(dato.horaIngreso);
+      const salida = new Date(dato.horaSalida);
+      const tiempo = Math.ceil((salida - entrada) / 60000);
+      const barcodeURL = `https://barcode.tec-it.com/barcode.ashx?data=${encodeURIComponent(dato.placa)}&code=Code128&translate-esc=false`;
+
+      const ventana = window.open('', '', 'width=300,height=650');
+      ventana.document.write(`
+        <html><head><style>
+          body {
+            margin: 0;
+            font-family: monospace;
+            font-size: 14pt;
+            text-align: center;
+            padding: 10px;
+          }
+          img.logo {
+            width: 100%;
+            max-width: 260px;
+            margin-bottom: 10px;
+          }
+          .grande {
+            font-size: 18pt;
+            font-weight: bold;
+          }
+          .linea {
+            margin: 10px 0;
+            border-top: 1px dashed #000;
+          }
+          .barra {
+            margin-top: 20px;
+          }
+        </style></head><body>
+          <img src="IMAGEN1.jpg" class="logo" alt="Logo" />
+          <div class="linea"></div>
+          <div>FACTURA VEHÍCULO GYM <span style="font-size:1.2em;">💪</span></div>
+          <div class="linea"></div>
+          <div>PLACA</div>
+          <div class="grande">${dato.placa}</div>
+          <div class="linea"></div>
+          <div>MARCA</div>
+          <div class="grande">${dato.marca}</div>
+          <div class="linea"></div>
+          <div>ENTRADA</div>
+          <div>${entrada.toLocaleString()}</div>
+          <div class="linea"></div>
+          <div>SALIDA</div>
+          <div>${salida.toLocaleString()}</div>
+          <div class="linea"></div>
+          <div>TIEMPO TOTAL</div>
+          <div class="grande">${tiempo} minutos</div>
+          <div class="linea"></div>
+          <div>TOTAL A PAGAR</div>
+          <div class="grande" style="color:#388e3c;">Q0.00</div>
+          <div class="linea"></div>
+          <div class="barra">
+            <img src="${barcodeURL}" alt="Código de Barras" />
+          </div>
+          <div class="linea"></div>
+          <pre>
+Gracias por su visita
+PARQUEO PARA GYM
+          </pre>
+        </body></html>
+      `);
+      ventana.document.close();
+      ventana.print();
+    }
+
+    // ------------------- FIN MODIFICACIÓN GYM -------------------
+
     function cerrarTurno() {
       const ventana = window.open('', '', 'width=300,height=400');
       const total = datos.reduce((sum, v) => sum + (v.total || 0), 0);
@@ -357,27 +468,8 @@ Gracias
       actualizarTabla();
     }
 
-    function actualizarTabla() {
-      const tabla = document.getElementById('registro');
-      tabla.innerHTML = '';
-      datos.forEach((d, i) => {
-        const fila = document.createElement('tr');
-        fila.innerHTML = `
-          <td>${d.placa}</td>
-          <td>${d.marca}</td>
-          <td>${new Date(d.horaIngreso).toLocaleString()}</td>
-          <td>${d.horaSalida ? new Date(d.horaSalida).toLocaleString() : '-'}</td>
-          <td>${d.total !== null ? 'Q' + d.total.toFixed(2) : '-'}</td>
-          <td>${d.horaSalida ? '' : '<button onclick="sacarVehiculo(' + i + ')">Salir</button>'}</td>
-        `;
-        tabla.appendChild(fila);
-      });
-
-      const total = datos.reduce((sum, v) => sum + (v.total || 0), 0);
-      document.getElementById('totalTurno').innerText = `Total actual: Q${total.toFixed(2)}`;
-    }
-
     actualizarTabla();
   </script>
 </body>
 </html>
+
