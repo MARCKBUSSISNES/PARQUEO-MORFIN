@@ -10,7 +10,6 @@
       background-color: #20597c;
       margin: 0;
       padding: 2rem;
-      position: relative;
       min-height: 100vh;
     }
     /* LOGIN STYLES */
@@ -22,27 +21,29 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      /* Fondo con imagen */
-      background: url('FONDO 32') center center / cover no-repeat #20597c;
-      /* fallback color */
+      background: url('FONDO 32.png') center center / cover no-repeat;
     }
     .login-box {
-      background: #4091bcdd;
-      border-radius: 8px;
+      background: rgba(0,0,0,0.92);
+      border-radius: 12px;
       box-shadow: 0 8px 30px rgba(0,0,0,0.22);
       padding: 2.5rem 2.5rem 2rem 2.5rem;
       text-align: center;
       min-width: 330px;
       max-width: 95vw;
       position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
     .login-logo {
-      width: 88px;
-      height: 88px;
+      width: 90px;
+      height: 90px;
       object-fit: contain;
-      margin-bottom: 0.8rem;
-      margin-top: -0.5rem;
-      filter: drop-shadow(0 2px 8px #4444cc77);
+      margin-bottom: 0.7rem;
+      margin-top: -0.6rem;
+      filter: drop-shadow(0 2px 8px #222a);
+      background: none;
     }
     .login-box h2 {
       margin: 0 0 2rem 0;
@@ -58,22 +59,22 @@
       border-radius: 5px;
       border: none;
       margin-bottom: 1rem;
-      background: #181818;
+      background: #111;
       font-size: 1rem;
       color: #f3f6ff;
       outline: none;
       transition: 0.2s;
-      box-shadow: 0 0 0 1.5px #333 inset;
-      opacity: 0.95;
+      box-shadow: 0 0 0 1.5px #444 inset;
+      opacity: 0.97;
     }
     .login-box input::placeholder {
       color: #b8b8b8;
-      opacity: 0.8;
+      opacity: 0.85;
       font-weight: 400;
     }
     .login-box input:focus {
       box-shadow: 0 0 0 2.5px #5eb2ff;
-      background: #232323;
+      background: #181818;
       color: #fff;
     }
     .login-box button {
@@ -105,7 +106,7 @@
     }
     .volver-link {
       display: block;
-      margin-top: 1.5rem;
+      margin-top: 1.2rem;
       color: #e7f7ff;
       font-size: 0.99rem;
       text-align: center;
@@ -113,14 +114,14 @@
       cursor: pointer;
     }
     .firma-marck {
-      margin-top: 1.4rem;
+      margin-top: 1.5rem;
       color: #fff;
-      font-size: 1.07rem;
-      opacity: 0.85;
-      letter-spacing: 1.2px;
+      font-size: 1.04rem;
+      opacity: 0.90;
+      letter-spacing: 1px;
       text-align: center;
       font-weight: 500;
-      text-shadow: 0 2px 4px #002b3d50;
+      text-shadow: 0 2px 4px #000a;
     }
     /* Lo demás de tu app */
     .encabezado-global {
@@ -213,17 +214,17 @@
 <!-- Pantalla LOGIN -->
 <div id="login-bg" class="login-bg">
   <form class="login-box" id="loginForm" autocomplete="off" onsubmit="return false;">
-    <img src="LOGO1" alt="Logo" class="login-logo" />
+    <img src="LOGO1.png" alt="Logo" class="login-logo" />
     <h2>Bienvenido</h2>
     <input id="usuario" type="text" placeholder="Usuario" autocomplete="off" autofocus />
     <input id="clave" type="password" placeholder="Contraseña" autocomplete="off" />
-    <button onclick="loginSistema()">Login</button>
+    <button type="button" onclick="loginSistema()">Login</button>
     <div class="login-links">
       ¿Perdiste tu contraseña? <a onclick="alert('Contacta a tu administrador')">Recupérala</a><br>
       ¿No tienes Cuenta? <a onclick="alert('Acceso solo para personal autorizado')">Regístrate</a>
     </div>
     <span class="volver-link" onclick="location.reload()">Volver</span>
-    <div class="firma-marck">Marck Business</div>
+    <div class="firma-marck">Todos los derechos reservados Marck Business 2025</div>
   </form>
 </div>
 
@@ -262,7 +263,7 @@
 </div>
 
 <script>
-  // -------- LOGIN VISUAL ----------
+  // -------- LOGIN VISUAL (VALIDACIÓN ESTRICTA) ----------
   function loginSistema() {
     var usuario = document.getElementById('usuario').value.trim();
     var clave = document.getElementById('clave').value.trim();
@@ -271,7 +272,7 @@
       document.getElementById('contenido').style.display = 'block';
       document.getElementById('usuario').value = '';
       document.getElementById('clave').value = '';
-      setTimeout(() => { // Foco automático al primer campo al entrar
+      setTimeout(() => {
         var input = document.getElementById('placa');
         if(input) input.focus();
       }, 200);
@@ -283,9 +284,15 @@
       return false;
     }
   }
-  // Permitir enter para login
-  document.getElementById('loginForm').addEventListener('submit', loginSistema);
+  // Evitar submit por enter y reforzar validación
+  document.getElementById('loginForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    loginSistema();
+  });
   document.getElementById('clave').addEventListener('keyup', function(e){
+    if(e.key === 'Enter') loginSistema();
+  });
+  document.getElementById('usuario').addEventListener('keyup', function(e){
     if(e.key === 'Enter') loginSistema();
   });
 
@@ -621,3 +628,4 @@ Gracias
 </script>
 </body>
 </html>
+
