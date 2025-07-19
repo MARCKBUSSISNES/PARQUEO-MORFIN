@@ -12,28 +12,40 @@
       padding: 2rem;
       position: relative;
     }
+    .encabezado-global {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .encabezado-global img {
+      max-width: 100%;
+      height: auto;
+      max-height: 100px;
+    }
     .container {
       max-width: 800px;
       margin: auto;
       background: #ffffff;
       padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
     }
-    .encabezado-global {
+    h1 {
       text-align: center;
-      font-size: 2.5rem;
-      font-weight: bold;
-      color: white;
-      margin-bottom: 1.5rem;
+      color: #2c3e50;
+      font-size: 2rem;
+      margin-bottom: 1rem;
     }
-    h1 { text-align: center; color: #2c3e50; }
     input, button {
-      padding: 0.6rem;
+      padding: 0.7rem;
       margin: 0.5rem;
       font-size: 1rem;
       border: 1px solid #ccc;
-      border-radius: 5px;
+      border-radius: 8px;
+      transition: 0.3s ease;
+    }
+    input:focus, button:hover {
+      outline: none;
+      box-shadow: 0 0 5px #2980b9;
     }
     button {
       background-color: #2980b9;
@@ -51,7 +63,7 @@
     }
     th, td {
       border: 1px solid #ccc;
-      padding: 0.5rem;
+      padding: 0.6rem;
       text-align: center;
     }
     th {
@@ -61,8 +73,9 @@
     .total {
       font-weight: bold;
       font-size: 1.2rem;
-      margin-top: 1rem;
+      margin-top: 1.5rem;
       color: #2c3e50;
+      text-align: center;
     }
     .footer {
       position: fixed;
@@ -85,7 +98,9 @@
   </style>
 </head>
 <body>
-  <div class="encabezado-global">MULTICARS</div>
+  <div class="encabezado-global">
+    <img src="IMAGEN1.jpg" alt="Logo" />
+  </div>
 
   <div class="container">
     <h1>Control de Parqueo</h1>
@@ -139,23 +154,63 @@
     }
 
     function imprimirTicket(placa, marca, hora) {
-      const ventana = window.open('', '', 'width=300,height=400');
+      const fecha = new Date(hora);
+      const fechaStr = fecha.toLocaleDateString();
+      const horaStr = fecha.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      const barcodeURL = `https://barcode.tec-it.com/barcode.ashx?data=${encodeURIComponent(placa)}&code=Code128&translate-esc=false`;
+
+      const ventana = window.open('', '', 'width=300,height=600');
       ventana.document.write(`
         <html><head><style>
-        body { margin: 0; font-family: monospace; font-size: 18pt; text-align: center; }
-        img { max-width: 100px; margin-top: 10px; }
+          body {
+            margin: 0;
+            font-family: monospace;
+            font-size: 14pt;
+            text-align: center;
+            padding: 10px;
+          }
+          img.logo {
+            width: 100%;
+            max-width: 260px;
+            margin-bottom: 10px;
+          }
+          .grande {
+            font-size: 18pt;
+            font-weight: bold;
+          }
+          .linea {
+            margin: 10px 0;
+            border-top: 1px dashed #000;
+          }
+          .barra {
+            margin-top: 20px;
+          }
         </style></head><body>
-        <img src="IMAGEN1.jpg" alt="Logo" />
-        <pre>
-MULTICARS
-
-PLACA: ${placa}
-MARCA: ${marca}
-INGRESO: ${new Date(hora).toLocaleString()}
-
+          <img src="IMAGEN1.jpg" class="logo" alt="Logo" />
+          <div class="linea"></div>
+          <div>FECHA</div>
+          <div>${fechaStr}</div>
+          <div class="linea"></div>
+          <div>HORA DE INGRESO</div>
+          <div class="grande">${horaStr}</div>
+          <div class="linea"></div>
+          <div>PLACA</div>
+          <div class="grande">${placa}</div>
+          <div class="linea"></div>
+          <div>MARCA DEL VEHÍCULO</div>
+          <div class="grande">${marca}</div>
+          <div class="linea"></div>
+          <div class="barra">
+            <img src="${barcodeURL}" alt="Código de Barras" />
+          </div>
+          <div class="linea"></div>
+          <pre>
 Gracias por su visita
 *RECUERDE NO PERDER SU TICKET*
-        </pre></body></html>`);
+          </pre>
+        </body></html>
+      `);
       ventana.document.close();
       ventana.print();
     }
@@ -197,7 +252,7 @@ Gracias por su visita
         }
       }
 
-      return 88; // Si se pasa de los rangos
+      return 88;
     }
 
     function sacarVehiculo(index) {
@@ -210,30 +265,69 @@ Gracias por su visita
     }
 
     function imprimirFactura(dato) {
-      const ventana = window.open('', '', 'width=300,height=500');
       const entrada = new Date(dato.horaIngreso);
       const salida = new Date(dato.horaSalida);
       const tiempo = Math.ceil((salida - entrada) / 60000);
+      const barcodeURL = `https://barcode.tec-it.com/barcode.ashx?data=${encodeURIComponent(dato.placa)}&code=Code128&translate-esc=false`;
+
+      const ventana = window.open('', '', 'width=300,height=650');
       ventana.document.write(`
         <html><head><style>
-        body { margin: 0; font-family: monospace; font-size: 16pt; text-align: center; }
-        img { max-width: 100px; margin-top: 10px; }
+          body {
+            margin: 0;
+            font-family: monospace;
+            font-size: 14pt;
+            text-align: center;
+            padding: 10px;
+          }
+          img.logo {
+            width: 100%;
+            max-width: 260px;
+            margin-bottom: 10px;
+          }
+          .grande {
+            font-size: 18pt;
+            font-weight: bold;
+          }
+          .linea {
+            margin: 10px 0;
+            border-top: 1px dashed #000;
+          }
+          .barra {
+            margin-top: 20px;
+          }
         </style></head><body>
-        <img src="IMAGEN1.jpg" alt="Logo" />
-        <pre>
-MULTICARS
-
-FACTURA VEHÍCULO
-
-PLACA: ${dato.placa}
-MARCA: ${dato.marca}
-ENTRADA: ${entrada.toLocaleString()}
-SALIDA : ${salida.toLocaleString()}
-TIEMPO : ${tiempo} min
-TOTAL  : Q${dato.total.toFixed(2)}
-
+          <img src="IMAGEN1.jpg" class="logo" alt="Logo" />
+          <div class="linea"></div>
+          <div>FACTURA VEHÍCULO</div>
+          <div class="linea"></div>
+          <div>PLACA</div>
+          <div class="grande">${dato.placa}</div>
+          <div class="linea"></div>
+          <div>MARCA</div>
+          <div class="grande">${dato.marca}</div>
+          <div class="linea"></div>
+          <div>ENTRADA</div>
+          <div>${entrada.toLocaleString()}</div>
+          <div class="linea"></div>
+          <div>SALIDA</div>
+          <div>${salida.toLocaleString()}</div>
+          <div class="linea"></div>
+          <div>TIEMPO TOTAL</div>
+          <div class="grande">${tiempo} minutos</div>
+          <div class="linea"></div>
+          <div>TOTAL A PAGAR</div>
+          <div class="grande">Q${dato.total.toFixed(2)}</div>
+          <div class="linea"></div>
+          <div class="barra">
+            <img src="${barcodeURL}" alt="Código de Barras" />
+          </div>
+          <div class="linea"></div>
+          <pre>
 Gracias por su visita
-        </pre></body></html>`);
+          </pre>
+        </body></html>
+      `);
       ventana.document.close();
       ventana.print();
     }
