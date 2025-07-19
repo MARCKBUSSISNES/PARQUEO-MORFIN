@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -57,11 +56,6 @@
     button:hover {
       background-color: #1c5980;
     }
-    .gym-button {
-      background-color: yellow;
-      color: black;
-      font-weight: bold;
-    }
     table {
       width: 100%;
       border-collapse: collapse;
@@ -114,7 +108,6 @@
     <input type="text" id="marca" placeholder="Marca del vehículo" />
     <button onclick="registrarIngreso()">Ingresar</button>
     <button onclick="cerrarTurno()">Cierre de Turno</button>
-    <button class="gym-button" onclick="salidaGym()">GYM</button>
 
     <table id="tablaRegistro">
       <thead>
@@ -154,32 +147,120 @@
       const hora = new Date().toISOString();
       datos.push({ placa, marca, horaIngreso: hora, horaSalida: null, total: null });
       localStorage.setItem(storageKey, JSON.stringify(datos));
+      imprimirTicket(placa, marca, hora);
       placaInput.value = "";
       marcaInput.value = "";
       actualizarTabla();
     }
 
-    function salidaGym() {
-      const placaInput = document.getElementById('placa');
-      const marcaInput = document.getElementById('marca');
-      const placa = placaInput.value.trim();
-      const marca = marcaInput.value.trim();
-      if (!placa || !marca) return alert("Ingrese placa y marca para salida GYM");
+    function imprimirTicket(placa, marca, hora) {
+      const fecha = new Date(hora);
+      const fechaStr = fecha.toLocaleDateString();
+      const horaStr = fecha.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-      const ahora = new Date().toISOString();
-      const registro = {
-        placa,
-        marca,
-        horaIngreso: ahora,
-        horaSalida: ahora,
-        total: 0
-      };
+      const barcodeURL = `https://barcode.tec-it.com/barcode.ashx?data=${encodeURIComponent(placa)}&code=Code128&translate-esc=false`;
 
-      datos.push(registro);
+      const ventana = window.open('', '', 'width=300,height=600');
+      ventana.document.write(`
+        <html><head><style>
+          body {
+            margin: 0;
+            font-family: monospace;
+            font-size: 14pt;
+            text-align: center;
+            padding: 10px;
+          }
+          img.logo {
+            width: 100%;
+            max-width: 260px;
+            margin-bottom: 10px;
+          }
+          .grande {
+            font-size: 18pt;
+            font-weight: bold;
+          }
+          .linea {
+            margin: 10px 0;
+            border-top: 1px dashed #000;
+          }
+          .barra {
+            margin-top: 20px;
+          }
+        </style></head><body>
+          <img src="IMAGEN1.jpg" class="logo" alt="Logo" />
+          <div class="linea"></div>
+          <div>FECHA</div>
+          <div>${fechaStr}</div>
+          <div class="linea"></div>
+          <div>HORA DE INGRESO</div>
+          <div class="grande">${horaStr}</div>
+          <div class="linea"></div>
+          <div>PLACA</div>
+          <div class="grande">${placa}</div>
+          <div class="linea"></div>
+          <div>MARCA DEL VEHÍCULO</div>
+          <div class="grande">${marca}</div>
+          <div class="linea"></div>
+          <div class="barra">
+            <img src="${barcodeURL}" alt="Código de Barras" />
+          </div>
+          <div class="linea"></div>
+          <pre>
+Gracias por su visita
+*RECUERDE NO PERDER SU TICKET*
+          </pre>
+        </body></html>
+      `);
+      ventana.document.close();
+      ventana.print();
+    }
+
+    function calcularPago(horaIngreso, horaSalida) {
+      const entrada = new Date(horaIngreso);
+      const salida = new Date(horaSalida);
+      const minutos = Math.ceil((salida - entrada) / 60000);
+
+      const tarifas = [
+        { min: 0, max: 5, precio: 0 },
+        { min: 6, max: 35, precio: 5 },
+        { min: 36, max: 65, precio: 8 },
+        { min: 66, max: 95, precio: 13 },
+        { min: 96, max: 125, precio: 16 },
+        { min: 126, max: 155, precio: 21 },
+        { min: 156, max: 185, precio: 24 },
+        { min: 186, max: 215, precio: 29 },
+        { min: 216, max: 245, precio: 32 },
+        { min: 246, max: 275, precio: 37 },
+        { min: 276, max: 305, precio: 40 },
+        { min: 306, max: 335, precio: 45 },
+        { min: 336, max: 365, precio: 48 },
+        { min: 366, max: 395, precio: 53 },
+        { min: 396, max: 425, precio: 56 },
+        { min: 426, max: 455, precio: 61 },
+        { min: 456, max: 485, precio: 64 },
+        { min: 486, max: 515, precio: 69 },
+        { min: 516, max: 545, precio: 72 },
+        { min: 546, max: 575, precio: 77 },
+        { min: 576, max: 605, precio: 80 },
+        { min: 606, max: 635, precio: 85 },
+        { min: 636, max: 665, precio: 88 }
+      ];
+
+      for (let i = 0; i < tarifas.length; i++) {
+        if (minutos >= tarifas[i].min && minutos <= tarifas[i].max) {
+          return tarifas[i].precio;
+        }
+      }
+
+      return 88;
+    }
+
+    function sacarVehiculo(index) {
+      const salida = new Date().toISOString();
+      datos[index].horaSalida = salida;
+      datos[index].total = calcularPago(datos[index].horaIngreso, salida);
+      imprimirFactura(datos[index]);
       localStorage.setItem(storageKey, JSON.stringify(datos));
-      imprimirFactura(registro);
-      placaInput.value = "";
-      marcaInput.value = "";
       actualizarTabla();
     }
 
@@ -187,60 +268,88 @@
       const entrada = new Date(dato.horaIngreso);
       const salida = new Date(dato.horaSalida);
       const tiempo = Math.ceil((salida - entrada) / 60000);
-      const barcodeURL = `https://barcode.tec-it.com/barcode.ashx?data=${encodeURIComponent(dato.placa)}&code=Code128`;
+      const barcodeURL = `https://barcode.tec-it.com/barcode.ashx?data=${encodeURIComponent(dato.placa)}&code=Code128&translate-esc=false`;
 
       const ventana = window.open('', '', 'width=300,height=650');
-      ventana.document.write(\`
+      ventana.document.write(`
         <html><head><style>
-        body { font-family: monospace; text-align: center; font-size: 14pt; padding: 10px; }
-        .logo { width: 100%; max-width: 260px; }
-        .linea { border-top: 1px dashed #000; margin: 10px 0; }
-        .grande { font-size: 18pt; font-weight: bold; }
+          body {
+            margin: 0;
+            font-family: monospace;
+            font-size: 14pt;
+            text-align: center;
+            padding: 10px;
+          }
+          img.logo {
+            width: 100%;
+            max-width: 260px;
+            margin-bottom: 10px;
+          }
+          .grande {
+            font-size: 18pt;
+            font-weight: bold;
+          }
+          .linea {
+            margin: 10px 0;
+            border-top: 1px dashed #000;
+          }
+          .barra {
+            margin-top: 20px;
+          }
         </style></head><body>
-        <img src="IMAGEN1.jpg" class="logo" />
-        <div class="linea"></div>
-        <div>FACTURA VEHÍCULO</div>
-        <div class="linea"></div>
-        <div>PLACA</div><div class="grande">\${dato.placa}</div>
-        <div class="linea"></div>
-        <div>MARCA</div><div class="grande">\${dato.marca}</div>
-        <div class="linea"></div>
-        <div>ENTRADA</div><div>\${entrada.toLocaleString()}</div>
-        <div class="linea"></div>
-        <div>SALIDA</div><div>\${salida.toLocaleString()}</div>
-        <div class="linea"></div>
-        <div>TIEMPO</div><div class="grande">\${tiempo} minutos</div>
-        <div class="linea"></div>
-        <div>TOTAL</div><div class="grande">Q\${dato.total.toFixed(2)}</div>
-        <div class="linea"></div>
-        <img src="\${barcodeURL}" />
-        <div class="linea"></div>
-        <pre>Gracias por su visita</pre>
+          <img src="IMAGEN1.jpg" class="logo" alt="Logo" />
+          <div class="linea"></div>
+          <div>FACTURA VEHÍCULO</div>
+          <div class="linea"></div>
+          <div>PLACA</div>
+          <div class="grande">${dato.placa}</div>
+          <div class="linea"></div>
+          <div>MARCA</div>
+          <div class="grande">${dato.marca}</div>
+          <div class="linea"></div>
+          <div>ENTRADA</div>
+          <div>${entrada.toLocaleString()}</div>
+          <div class="linea"></div>
+          <div>SALIDA</div>
+          <div>${salida.toLocaleString()}</div>
+          <div class="linea"></div>
+          <div>TIEMPO TOTAL</div>
+          <div class="grande">${tiempo} minutos</div>
+          <div class="linea"></div>
+          <div>TOTAL A PAGAR</div>
+          <div class="grande">Q${dato.total.toFixed(2)}</div>
+          <div class="linea"></div>
+          <div class="barra">
+            <img src="${barcodeURL}" alt="Código de Barras" />
+          </div>
+          <div class="linea"></div>
+          <pre>
+Gracias por su visita
+          </pre>
         </body></html>
-      \`);
+      `);
       ventana.document.close();
       ventana.print();
     }
 
     function cerrarTurno() {
+      const ventana = window.open('', '', 'width=300,height=400');
       const total = datos.reduce((sum, v) => sum + (v.total || 0), 0);
-      const ventana = window.open('', '', 'width=300,height=600');
-      ventana.document.write(\`
+      ventana.document.write(`
         <html><head><style>
-        body { font-family: monospace; text-align: center; font-size: 18pt; padding: 10px; }
-        .logo { width: 100%; max-width: 260px; }
-        .linea { border-top: 1px dashed #000; margin: 10px 0; }
+        body { margin: 0; font-family: monospace; font-size: 20pt; text-align: center; }
+        img { max-width: 100px; margin-top: 10px; }
         </style></head><body>
-        <img src="IMAGEN1.jpg" class="logo" />
-        <div class="linea"></div>
-        <div><strong>CIERRE DE TURNO</strong></div>
-        <div class="linea"></div>
-        <div>TOTAL DEL TURNO</div>
-        <div style="font-size:22pt; font-weight:bold;">Q\${total.toFixed(2)}</div>
-        <div class="linea"></div>
-        <pre>Gracias</pre>
-        </body></html>
-      \`);
+        <img src="IMAGEN1.jpg" alt="Logo" />
+        <pre>
+MULTICARS
+
+*** CIERRE DE TURNO ***
+
+TOTAL DEL TURNO: Q${total.toFixed(2)}
+
+Gracias
+        </pre></body></html>`);
       ventana.document.close();
       ventana.print();
       localStorage.removeItem(storageKey);
@@ -253,35 +362,19 @@
       tabla.innerHTML = '';
       datos.forEach((d, i) => {
         const fila = document.createElement('tr');
-        fila.innerHTML = \`
-          <td>\${d.placa}</td>
-          <td>\${d.marca}</td>
-          <td>\${new Date(d.horaIngreso).toLocaleString()}</td>
-          <td>\${d.horaSalida ? new Date(d.horaSalida).toLocaleString() : '-'}</td>
-          <td>\${d.total !== null ? 'Q' + d.total.toFixed(2) : '-'}</td>
-          <td>\${d.horaSalida ? '' : '<button onclick="sacarVehiculo(' + i + ')">Salir</button>'}</td>
-        \`;
+        fila.innerHTML = `
+          <td>${d.placa}</td>
+          <td>${d.marca}</td>
+          <td>${new Date(d.horaIngreso).toLocaleString()}</td>
+          <td>${d.horaSalida ? new Date(d.horaSalida).toLocaleString() : '-'}</td>
+          <td>${d.total !== null ? 'Q' + d.total.toFixed(2) : '-'}</td>
+          <td>${d.horaSalida ? '' : '<button onclick="sacarVehiculo(' + i + ')">Salir</button>'}</td>
+        `;
         tabla.appendChild(fila);
       });
 
       const total = datos.reduce((sum, v) => sum + (v.total || 0), 0);
-      document.getElementById('totalTurno').innerText = \`Total actual: Q\${total.toFixed(2)}\`;
-    }
-
-    function sacarVehiculo(index) {
-      const salida = new Date().toISOString();
-      datos[index].horaSalida = salida;
-      datos[index].total = calcularPago(datos[index].horaIngreso, salida);
-      imprimirFactura(datos[index]);
-      localStorage.setItem(storageKey, JSON.stringify(datos));
-      actualizarTabla();
-    }
-
-    function calcularPago(horaIngreso, horaSalida) {
-      const entrada = new Date(horaIngreso);
-      const salida = new Date(horaSalida);
-      const minutos = Math.ceil((salida - entrada) / 60000);
-      return minutos <= 5 ? 0 : 10;
+      document.getElementById('totalTurno').innerText = `Total actual: Q${total.toFixed(2)}`;
     }
 
     actualizarTabla();
