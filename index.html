@@ -7,7 +7,6 @@
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #000000c;
       margin: 0;
       padding: 2rem;
       min-height: 100vh;
@@ -133,6 +132,17 @@
       height: auto;
       max-height: 200px;
     }
+    /* CAMBIO SOLICITADO: color de fondo para el sistema */
+    #contenido {
+      display: none;
+      background: #1e282e !important;
+      min-height: 100vh;
+      width: 100vw;
+      position: absolute;
+      top: 0; left: 0;
+      z-index: 1;
+      padding-bottom: 40px;
+    }
     .container {
       max-width: 800px;
       margin: auto;
@@ -207,7 +217,6 @@
     .whatsapp img {
       width: 60px;
     }
-    #contenido { display: none; }
   </style>
 </head>
 <body>
@@ -284,7 +293,6 @@
       return false;
     }
   }
-  // Evitar submit por enter y reforzar validación
   document.getElementById('loginForm').addEventListener('submit', function(e){
     e.preventDefault();
     loginSistema();
@@ -628,4 +636,3 @@ Gracias
 </script>
 </body>
 </html>
-
